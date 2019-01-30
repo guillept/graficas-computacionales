@@ -48,10 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\hitable.h" />
     <ClCompile Include="src\vec3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\hitable_list.h" />
     <ClInclude Include="src\ray.h" />
+    <ClInclude Include="src\sphere.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
