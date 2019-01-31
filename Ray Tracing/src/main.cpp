@@ -85,7 +85,11 @@ int main(){
 	hitable *world = new hitable_list(list, 5);
 
 	// camera cam(90, float(nx)/float(ny));
-	camera cam(vec3(-2, 2, 1), vec3(0, 0, -1), vec3(0, 1, 0), 90, float(nx) / float(ny));
+	vec3 lookfrom(3, 3, 2);
+	vec3 lookat(0, 0, -1);
+	float dist_to_focus = (lookfrom - lookat).length();
+	float apertur = 2.0;
+	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(nx) / float(ny), apertur, dist_to_focus);
 	float R = cos(3.1416 / 4);
 	/* hitable *list[2];
 	list[0] = new sphere(vec3(-R, 0, -1), R, new lambertian(vec3(0, 0, 1)));
