@@ -38,5 +38,11 @@
     <ClInclude Include="src\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lambertin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

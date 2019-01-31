@@ -5,6 +5,7 @@
 #include "hitable_list.h"
 #include "float.h"
 #include "camera.h"
+#include "material.h"
 #define MAXFLOAT    3.37E+38
 
 // #include "vec3.h"
@@ -24,14 +25,7 @@
 	// return (discriminant > 0);
 } */
 
-vec3 random_in_unit_shpere() {
-	vec3 p;
-	do {
-		p = 2.0*vec3(float(rand()) / RAND_MAX, float(rand()) / RAND_MAX, float(rand()) / RAND_MAX) - vec3(1, 1, 1);
-	} while (p.squared_length() >= 1.0);
-	return p;
-}
-vec3 color(const ray& r, hitable *world) {
+vec3 color(const ray& r, hitable *world, int depth) {
 	/* float t = hit_sphere(vec3(0, 0, -1), 0.5, r);
 	if (t > 0.0) {
 		vec3 N = unit_vector(r.point_at_parameter(t) - vec3(0, 0, -1));
@@ -41,8 +35,16 @@ vec3 color(const ray& r, hitable *world) {
 		return vec3(1, 0, 0); */
 	hit_record rec;
 	if (world->hit(r, 0.001, FLT_MAX, rec)) {
-		vec3 target = rec.p + rec.normal + random_in_unit_shpere();
-		return 0.5*color(ray(rec.p, target - rec.p), world);
+		ray scattered;
+		vec3 attenuation;
+		if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
+			return attenuation * color(scattered, world, depth + 1);
+		}
+		else {
+			return vec3(0, 0, 0);
+		}
+		/* vec3 target = rec.p + rec.normal + random_in_unit_shpere();
+		return 0.5*color(ray(rec.p, target - rec.p), world); */
 		//return 0.5*vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
 	}
 	else {
@@ -66,10 +68,13 @@ int main(){
 	vec3 vertical(0.0, 2.0, 0.0);
 	vec3 origin(0.0, 0.0, 0.0); */
 
-	hitable *list[2];
-	list[0] = new sphere(vec3(0, 0, -1), 0.5);
-	list[1] = new sphere(vec3(0, -100.5, -1), 100);
-	hitable *world = new hitable_list(list, 2);
+	hitable *list[4];
+	list[0] = new sphere(vec3(0, 0, -1), 0.5, new lambertian(vec3 (0.8, 0.3, 0.3)));
+	list[1] = new sphere(vec3(0, -100.5, -1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
+	list[2] = new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.6, 0.2)));
+	list[3] = new sphere(vec3(-1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8)));
+
+	hitable *world = new hitable_list(list, 4);
 	camera cam;
 	for (int j=ny-1; j>=0; j--){
 		for (int i=0; i<nx; i++){
@@ -79,7 +84,7 @@ int main(){
 				float v = float(j + float(rand())/RAND_MAX) / float(ny);
 				ray r = cam.get_ray(u, v);
 				vec3 p = r.point_at_parameter(2.0);
-				col += color(r, world);
+				col += color(r, world, 0);
 			}
 
 			col /= float(ns);
