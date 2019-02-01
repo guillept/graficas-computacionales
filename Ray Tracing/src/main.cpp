@@ -13,12 +13,12 @@
 // #include "ray.h"
 
 hitable *random_scene() {
-	int n = 500;
+	int n = 650;
 	hitable **list = new hitable*[n + 1];
 	list[0] = new sphere(vec3(0, -1000, 0), 1000, new lambertian(vec3(0.5, 0.5, 0.5)));
 	int i = 1;
-	for (int a = -11; a < 11; a++) {
-		for (int b = -11; b < 11; b++) {
+	for (int a = -13; a < 12; a++) {
+		for (int b = -13; b < 12; b++) {
 			float choose_mat = drand48;
 			vec3 center(a + 0.9*drand48, 0.2, b + 0.9*drand48);
 			if ((center - vec3(4, 0.2, 0)).length() > 0.9) {
@@ -35,9 +35,10 @@ hitable *random_scene() {
 		}
 	}
 
-	list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
-	list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
-	list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+	list[i++] = new sphere(vec3(-10, 1, 0), 1.0, new dielectric(1.5));
+    list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
+    list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+    list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new dielectric(1.5));
 	return new hitable_list(list, i);
 }
 /* float hit_sphere(const vec3& center, float radius, const ray& r) {
@@ -85,10 +86,10 @@ vec3 color(const ray& r, hitable *world, int depth) {
 
 int main(){
 
-	int nx = 300;
-	int ny = 200;
-	int ns = 200;
-	// std::cout << "P3\n" << nx << " " << ny << "\n255\n";
+	int nx = 1200;
+	int ny = 800;
+	int ns = 100;
+	std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
 	std::vector <unsigned char> pixels; //0 - 255 
 
