@@ -28,7 +28,7 @@ namespace cgmath
 		}
 
 	private:
-		float n[4][4] = { 0 };
+		float n[4][4];
 	};
 
 	/* 11. + <<{inline}>> operator*(m:const mat4&, v:const vec4&):vec4

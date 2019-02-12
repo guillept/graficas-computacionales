@@ -30,7 +30,7 @@ namespace cgmath
 		}
 
 	private:
-		float n[3][3] = { 0 };
+		float n[3][3];
 	};
 
 	/* 11. + <<{inline}>> operator*(m:const mat3&, v:const vec3&):vec3

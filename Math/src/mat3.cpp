@@ -7,18 +7,15 @@
 Constructor que inicializa las variables de instancia a sus valores por default. El valor por default de n contiene todos sus
 valores inicializados en 0.
 */
-cgmath::mat3::mat3()
+cgmath::mat3::mat3() : n{0}
 {
 }
 
 /*2. + mat3(diagonal:float)
 Constructor que inicializa las variables de instancia utilizando el parámetro diagonal para dar valor a la diagonal de la matriz.
 */
-cgmath::mat3::mat3(float diagonal)
+cgmath::mat3::mat3(float diagonal) : n{ {diagonal, 0, 0}, { 0, diagonal, 0 }, { 0, 0, diagonal }}
 {
-	n[0][0] = diagonal;
-	n[1][1] = diagonal;
-	n[2][2] = diagonal;
 }
 
 /*3. + mat3(a:const vec3&, b:const vec3&, c:const vec3&)

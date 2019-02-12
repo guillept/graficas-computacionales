@@ -7,19 +7,15 @@
 Constructor que inicializa las variables de instancia a sus valores por default. El valor por default de n contiene todos sus
 valores inicializados en 0.
 */
-cgmath::mat4::mat4()
+cgmath::mat4::mat4() : n{0}
 {
 }
 
 /*2. + mat4(diagonal:float)
 Constructor que inicializa las variables de instancia utilizando el parámetro diagonal para dar valor a la diagonal de la matriz.
 */
-cgmath::mat4::mat4(float diagonal)
+cgmath::mat4::mat4(float diagonal) : n {{diagonal, 0, 0, 0}, {0, diagonal, 0, 0}, {0, 0, diagonal, 0}, { 0, 0, 0, diagonal} }
 {
-	n[0][0] = diagonal;
-	n[1][1] = diagonal;
-	n[2][2] = diagonal;
-	n[3][3] = diagonal;
 }
 
 /*3. + mat4(a:const vec4&, b:const vec4&, c:const vec4&)
