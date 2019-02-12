@@ -6,6 +6,22 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\complex.h" />
+    <ClInclude Include="include\mat3.h" />
+    <ClInclude Include="include\mat4.h" />
+    <ClInclude Include="include\vec2.h" />
+    <ClInclude Include="include\vec3.h" />
+    <ClInclude Include="include\vec4.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\mat3.cpp" />
+    <ClCompile Include="src\complex.cpp" />
+    <ClCompile Include="src\mat4.cpp" />
+    <ClCompile Include="src\vec2.cpp" />
+    <ClCompile Include="src\vec3.cpp" />
+    <ClCompile Include="src\vec4.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{05C1DDD7-4263-40B2-B95C-BD61913CC590}</ProjectGuid>
