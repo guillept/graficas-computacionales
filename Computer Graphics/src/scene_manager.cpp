@@ -84,8 +84,17 @@ void scene_manager::initialize()
 	//std::unique_ptr<scene> somescene(new scene_project);
 	//sceneList.push_back(std::move(somescene));
 	
-	std::unique_ptr<scene> scene1(new scene_compatibility);
+	/*std::unique_ptr<scene> scene1(new scene_compatibility);
 	sceneList.push_back(std::move(scene1));
+
+	std::unique_ptr<scene> scene2(new scene_primitives);
+	sceneList.push_back(std::move(scene2));
+
+	/*std::unique_ptr<scene> scene_conchoid(new scene_conchoid);
+	sceneList.push_back(std::move(scene_conchoid)); */
+
+	std::unique_ptr<scene> schene_chaikin(new schene_chaikin);
+	sceneList.push_back(std::move(schene_chaikin));
 
 	for (auto& s : sceneList)
 		s->init();
