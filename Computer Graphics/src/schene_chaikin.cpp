@@ -8,15 +8,21 @@ void schene_chaikin::init() {
 	std::vector<std::vector<cgmath::vec2>> positions;
 
 	// std::vector<cgmath::vec2> positions;
-	std::vector<cgmath::vec2> positions_oreja_derecha;
 	std::vector<cgmath::vec2> positions_oreja_izquierda;
+	std::vector<cgmath::vec2> positions_oreja_derecha;
 
-	positions_oreja_derecha.push_back(cgmath::vec2(-0.9f, -0.9f));
-	positions_oreja_derecha.push_back(cgmath::vec2(-0.9f, 0.0f));
+	/*positions_oreja_derecha.push_back(cgmath::vec2(0.9f, -0.9f));
+	positions_oreja_derecha.push_back(cgmath::vec2(0.9f, 0.9f));
+	std::cout << positions_oreja_derecha.size() << std::endl;
 	positions.push_back(positions_oreja_derecha);
 
+	positions_oreja_izquierda.push_back(cgmath::vec2(-0.9f, -0.9f));
 	positions_oreja_izquierda.push_back(cgmath::vec2(-0.9f, 0.0f));
 	positions_oreja_izquierda.push_back(cgmath::vec2(0.0f, 0.0f));
+	positions_oreja_izquierda.push_back(cgmath::vec2(0.2f, -0.9f));
+	positions_oreja_izquierda.push_back(cgmath::vec2(0.7f, 0.9f));
+	positions_oreja_izquierda = schene_chaikin::calculate_chaikin(positions_oreja_izquierda);
+	std::cout << positions_oreja_izquierda.size() << std::endl;
 	positions.push_back(positions_oreja_izquierda);
 
 	/*
@@ -153,7 +159,7 @@ void schene_chaikin::init() {
 	*/
 
 	//Oreja Izquierda
-	/* positions_oreja_izquierda.push_back(cgmath::vec2(-0.6f, -0.5f));
+	positions_oreja_izquierda.push_back(cgmath::vec2(-0.6f, -0.5f));
 	positions_oreja_izquierda.push_back(cgmath::vec2(-0.64f, -0.5f));
 	positions_oreja_izquierda.push_back(cgmath::vec2(-0.66f, -0.52f));
 	positions_oreja_izquierda.push_back(cgmath::vec2(-0.66f, -0.56f));
@@ -164,7 +170,8 @@ void schene_chaikin::init() {
 	positions_oreja_izquierda.push_back(cgmath::vec2(-0.58f, -0.58f));
 	positions_oreja_izquierda.push_back(cgmath::vec2(-0.56f, -0.56f));
 	positions_oreja_izquierda.push_back(cgmath::vec2(-0.56f, -0.55f));
-	positions.push_back(positions_oreja_izquierda);
+	positions_oreja_izquierda = schene_chaikin::calculate_chaikin(positions_oreja_izquierda);
+	positions.push_back(positions_oreja_izquierda); 
 
 	//Oreja Derecha
 	positions_oreja_derecha.push_back(cgmath::vec2(0.7f, -0.15f));
@@ -179,12 +186,16 @@ void schene_chaikin::init() {
 	positions_oreja_derecha.push_back(cgmath::vec2(0.73f, -0.26f));
 	positions_oreja_derecha.push_back(cgmath::vec2(0.71f, -0.24f));
 	positions_oreja_derecha.push_back(cgmath::vec2(0.7f, -0.25f));
-	positions.push_back(positions_oreja_derecha);*/
+	positions_oreja_derecha = schene_chaikin::calculate_chaikin(positions_oreja_derecha);
+	positions.push_back(positions_oreja_derecha);
 
-	// positions = schene_chaikin::calculate_chaikin(positions);
+	for (std::vector<cgmath::vec2> position : positions)
+	{
+		size += position.size();
+		std::cout << position.size() << std::endl;
+	}
 
-	size = positions.size();
-	std::cout << positions.size() << std::endl; 
+	std::cout << size << std::endl; 
 
 	//Crea un identificador y lo guarda en vao
 	glGenVertexArrays(1, &vao);
@@ -251,12 +262,12 @@ void schene_chaikin::mainLoop()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glBindVertexArray(vao);
-	glDrawArrays(GL_LINE_STRIP, 0, size);//llamada a dibujar, primitiva, a partir de donde y cuantos
+	glDrawArrays(GL_LINE_STRIP, 0, 42);//llamada a dibujar, primitiva, a partir de donde y cuantos
 	glBindVertexArray(0); //unbind
 
 
 	glBindVertexArray(vao2);
-	glDrawArrays(GL_LINE_STRIP, 0, size);//llamada a dibujar, primitiva, a partir de donde y cuantos
+	glDrawArrays(GL_LINE_STRIP, 0, 38);//llamada a dibujar, primitiva, a partir de donde y cuantos
 	glBindVertexArray(0); //unbind
 
 }

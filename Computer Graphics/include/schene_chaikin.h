@@ -29,5 +29,5 @@ private:
 	GLuint positionsVBO, ebo2;
 	GLfloat Qx, Rx, Qy, Ry;
 
-	GLuint size;
+	GLuint size = 0;
 };
