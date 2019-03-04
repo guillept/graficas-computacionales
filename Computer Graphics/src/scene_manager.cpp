@@ -7,6 +7,10 @@
 
 #include "scene.h"
 #include "scene_compatibility.h"
+#include "scene_primitives.h"
+#include "schene_chaikin.h"
+#include "scene_conchoid.h"
+
 #include "time.h"
 
 std::vector<std::unique_ptr<scene>> scene_manager::sceneList;

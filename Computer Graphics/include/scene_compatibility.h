@@ -15,4 +15,7 @@ public:
 	void normalKeysUp(unsigned char key) { }
 	void specialKeys(int key) { }
 	void passiveMotion(int x, int y) { }
+
+private:
+	float angle;
 };
