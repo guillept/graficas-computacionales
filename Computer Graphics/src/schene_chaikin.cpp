@@ -4,7 +4,7 @@
 #include <vector>
 
 
-int size = 18;
+int size = 19;
 
 
 //Se manda a llamar una vez cuando se inicia la aplicacion
@@ -33,7 +33,7 @@ void schene_chaikin::init() {
 	positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoIzquierdo()));
 	//Ojo Derecha
 	positions.push_back(schene_chaikin::calculate_chaikin(createOjoDerecho()));
-	//positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoDerecho()));
+	positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoDerecho()));
 	//Nariz
 	positions.push_back(schene_chaikin::calculate_chaikin(createNariz()));
 	//Boca
@@ -76,8 +76,8 @@ void schene_chaikin::mainLoop()
 		else {
 			glDrawArrays(GL_LINE_STRIP, 0, positions[i].size());//llamada a dibujar, primitiva, a partir de donde y cuantos
 		}
-		glBindVertexArray(0); //unbind
-	}
+		glBindVertexArray(0); //unbind 
+	} 
 
 }
 
@@ -107,6 +107,7 @@ std::vector<cgmath::vec2> schene_chaikin::calculate_chaikin(std::vector<cgmath::
 
 void schene_chaikin::createVao(int i, std::vector<cgmath::vec2> position) {
 
+	std::cout << position.size() << std::endl;
 	//Crea un identificador y lo guarda en vao
 	glGenVertexArrays(i, &vaos[i-1]);
 	glBindVertexArray(vaos[i-1]); //se trabajara con el siguiente vao
@@ -432,12 +433,12 @@ std::vector<cgmath::vec2> schene_chaikin::createLineaOjoIzquierdo()
 {
 	std::vector<cgmath::vec2> positions;
 
-	positions.push_back(cgmath::vec2(-0.49f, -0.32f));
-	positions.push_back(cgmath::vec2(-0.49f, -0.32f));
+	positions.push_back(cgmath::vec2(-0.49f, -0.31f));
+	positions.push_back(cgmath::vec2(-0.49f, -0.31f));
 	positions.push_back(cgmath::vec2(-0.42f, -0.26f));
-	positions.push_back(cgmath::vec2(-0.36f, -0.25f)); //linea ojo
-	positions.push_back(cgmath::vec2(-0.295f, -0.24f));
-	positions.push_back(cgmath::vec2(-0.295f, -0.235f));
+	positions.push_back(cgmath::vec2(-0.36f, -0.245f)); //linea ojo
+	positions.push_back(cgmath::vec2(-0.29f, -0.25f));
+	positions.push_back(cgmath::vec2(-0.29f, -0.25f));
 
 	return positions;
 }
@@ -446,10 +447,10 @@ std::vector<cgmath::vec2> schene_chaikin::createLineaOjoDerecho()
 {
 	std::vector<cgmath::vec2> positions;
 
-	positions.push_back(cgmath::vec2(0.17, -0.1f));
-	positions.push_back(cgmath::vec2(0.17, -0.1f));
-	positions.push_back(cgmath::vec2(0.22f, -0.08f)); //linea ojo
-	positions.push_back(cgmath::vec2(0.32f, -0.06f));
+	positions.push_back(cgmath::vec2(0.17, -0.11f));
+	positions.push_back(cgmath::vec2(0.17, -0.11f));
+	positions.push_back(cgmath::vec2(0.25f, -0.08f)); //linea ojo
+	positions.push_back(cgmath::vec2(0.35f, -0.065f));
 	positions.push_back(cgmath::vec2(0.41f, -0.07f));
 	positions.push_back(cgmath::vec2(0.41f, -0.07f));
 
@@ -472,10 +473,10 @@ std::vector<cgmath::vec2> schene_chaikin::createPupila(int i) {
 	std::vector<cgmath::vec2> positions;
 	//izquierda
 	if (i == 0) {
-		positions.push_back(cgmath::vec2(-0.38f, -0.27f));
+		positions.push_back(cgmath::vec2(-0.385f, -0.27f));
 	}//derecha
 	else if (i == 1) {
-		positions.push_back(cgmath::vec2(0.285f, -0.09f));
+		positions.push_back(cgmath::vec2(0.295f, -0.09f));
 	}
 
 	return positions;

@@ -41,7 +41,7 @@ public:
 private:
 
 	//Este es el manager de memoria
-	GLuint vaos[20];
+	GLuint vaos[50];
 
 	//Buffer con atributo
 	GLuint positionsVBO;
