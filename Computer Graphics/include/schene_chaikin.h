@@ -26,16 +26,26 @@ public:
 	std::vector<cgmath::vec2> createCabezaInferior();
 	std::vector<cgmath::vec2> createCabezaInferior_B();
 	std::vector<cgmath::vec2> createCabezaSuperior();
+	std::vector<cgmath::vec2> createCabezaSuperior_B();
 	std::vector<cgmath::vec2> createCuello();
-	// std::vector<cgmath::vec2> createCabelloIzquierdo();
+	std::vector<cgmath::vec2> createGorro();
+	std::vector<cgmath::vec2> createGorro_centro();
+	std::vector<cgmath::vec2> createOjoIzquierdo();
+	std::vector<cgmath::vec2> createOjoDerecho();
+	std::vector<cgmath::vec2> createLineaOjoIzquierdo();
+	std::vector<cgmath::vec2> createLineaOjoDerecho();
+	std::vector<cgmath::vec2> createBoca();
+	std::vector<cgmath::vec2> createNariz();
+	std::vector<cgmath::vec2> createPupila(int i);
+
 private:
 
 	//Este es el manager de memoria
-	GLuint vao0, vao1, vao2, vao3, vao4, vao5, vao6, vao7;
+	GLuint vaos[20];
 
 	//Buffer con atributo
-	GLuint positionsVBO, ebo;
+	GLuint positionsVBO;
 	GLfloat Qx, Rx, Qy, Ry;
 
-	GLuint size_0, size_1, size_2, size_3, size_4, size_5, size_6, size_7, size_8;
+	std::vector<std::vector<cgmath::vec2>> positions;
 };

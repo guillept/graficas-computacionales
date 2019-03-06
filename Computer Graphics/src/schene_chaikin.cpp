@@ -4,103 +4,49 @@
 #include <vector>
 
 
+int size = 18;
+
+
 //Se manda a llamar una vez cuando se inicia la aplicacion
 void schene_chaikin::init() {
-
-	std::vector<std::vector<cgmath::vec2>> positions;
-
-	/* positions.push_back(cgmath::vec2(0.9f, -0.9f));
-	positions.push_back(cgmath::vec2(0.9f, 0.9f));
-	std::cout << positions.size() << std::endl;
-	positions.push_back(positions);
-
-	positions.push_back(cgmath::vec2(-0.9f, -0.9f));
-	positions.push_back(cgmath::vec2(-0.9f, 0.0f));
-	positions.push_back(cgmath::vec2(0.0f, 0.0f));
-	positions.push_back(cgmath::vec2(0.2f, -0.9f));
-	positions.push_back(cgmath::vec2(0.7f, 0.9f));
-	positions = schene_chaikin::calculate_chaikin(positions);
-	std::cout << positions.size() << std::endl;
-	positions.push_back(positions);
-	*/
-
-	/*
-	positions.push_back(cgmath::vec2(-0.9f, -0.9f));
-	positions.push_back(cgmath::vec2(-0.9f, 0.0f));
-	positions.push_back(cgmath::vec2(0.0f, 0.0f));
-	positions.push_back(cgmath::vec2(0.2f, -0.9f));
-	positions.push_back(cgmath::vec2(0.9f, 0.9f)); 
-	*/
-	
-
 	//Pelo Izquierdo
 	positions.push_back(schene_chaikin::calculate_chaikin(createCabelloIzquierdo()));
-	size_0 = positions[0].size();
-	std::cout << size_0 << std::endl;
 	//Pelo Derecho
 	positions.push_back(schene_chaikin::calculate_chaikin(createCabelloDerecho()));
-	size_1 = positions[1].size();
-	std::cout << size_1 << std::endl;
 	//Oreja Izquierda
 	positions.push_back(schene_chaikin::calculate_chaikin(createOrejaIzquierdo()));
-	size_2 = positions[2].size();
-	std::cout << size_2 << std::endl;
 	//Oreja Derecha
 	positions.push_back(schene_chaikin::calculate_chaikin(createOrejaDerecho()));
-	size_3 = positions[3].size();
-	//Cara superior 
+	//Cara superior
 	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaSuperior()));
-	size_4 = positions[4].size();
+	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaSuperior_B()));
 	// Cara Inferior
 	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaInferior()));
-	size_5 = positions[5].size();
 	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaInferior_B()));
-	size_6 = positions[6].size();
-
 	//Cuello
 	positions.push_back(createCuello());
-	size_7 = positions[7].size();
-	
+	//Gorro
+	positions.push_back(schene_chaikin::calculate_chaikin(createGorro()));
+	positions.push_back(schene_chaikin::calculate_chaikin(createGorro_centro()));
+	//Ojo izquierdo
+	positions.push_back(schene_chaikin::calculate_chaikin(createOjoIzquierdo()));
+	positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoIzquierdo()));
+	//Ojo Derecha
+	positions.push_back(schene_chaikin::calculate_chaikin(createOjoDerecho()));
+	//positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoDerecho()));
+	//Nariz
+	positions.push_back(schene_chaikin::calculate_chaikin(createNariz()));
+	//Boca
+	positions.push_back(schene_chaikin::calculate_chaikin(createBoca()));
+	//Pupila Izquierda
+	positions.push_back(createPupila(0));
+	//Pupila Derecha
+	positions.push_back(createPupila(1));
 
-	createVao(1, positions[0]);
-	createVao(2, positions[1]);
-	createVao(3, positions[2]);
-	createVao(4, positions[3]);
-	createVao(5, positions[4]);
-	createVao(6, positions[5]);
-	createVao(7, positions[6]);
-	createVao(8, positions[7]);
-
-
-	/* glGenVertexArrays(2, &vao2);
-	glBindVertexArray(vao2);
-	glGenBuffers(1, &positionsVBO); 
-	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	// orejaIzquierdaVBO - top
-	glGenBuffers(2, &ebo2);
-	glBindBuffer(GL_ARRAY_BUFFER, ebo2);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * positions.size(), positions.data(), GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);//prendo al atributo 0 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-	glBindBuffer(GL_ARRAY_BUFFER, 0); 	// Unbind de positionsVBO
-	glBindVertexArray(0);
-
-	/* for (int i = 0; i < 4; i++)
-	{ 
-		std::cout << vaos[i] << std::endl;
-		glGenVertexArrays(i+1, &(vaos[i]));
-		glBindVertexArray(vaos[i]);
-		glGenBuffers(1, &positionsVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-		glGenBuffers(2, &ebo);
-		glBindBuffer(GL_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * positions[i].size(), positions[i].data(), GL_DYNAMIC_DRAW);
-		glEnableVertexAttribArray(0);//prendo al atributo 0 
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-		glBindBuffer(GL_ARRAY_BUFFER, 0); 	// Unbind de positionsVBO
-		glBindVertexArray(0);
-
-	} */
+	for (int i = 1; i <= size; i++)
+	{
+		createVao(i, positions[i-1]);
+	}
 
 }
 
@@ -119,38 +65,19 @@ void schene_chaikin::mainLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindVertexArray(vao0);
-	glDrawArrays(GL_LINE_STRIP, 0, 146);//llamada a dibujar, primitiva, a partir de donde y cuantos
-	glBindVertexArray(0); //unbind
+	for (int i = 0; i < size; i++)
+	{
+		glBindVertexArray(vaos[i]);
+		if (positions[i].size() == 1) {
 
-	glBindVertexArray(vao1);
-	glDrawArrays(GL_LINE_STRIP, 0, 102);//llamada a dibujar, primitiva, a partir de donde y cuantos
-	glBindVertexArray(0); //unbind
-
-	glBindVertexArray(vao2);
-	glDrawArrays(GL_LINE_STRIP, 0, 42);//llamada a dibujar, primitiva, a partir de donde y cuantos
-	glBindVertexArray(0); //unbind
-
-	glBindVertexArray(vao3);
-	glDrawArrays(GL_LINE_STRIP, 0, size_3);//llamada a dibujar, primitiva, a partir de donde y cuantos
-	glBindVertexArray(0); //unbind
-
-	glBindVertexArray(vao4);
-	glDrawArrays(GL_LINE_STRIP, 0, size_4);//llamada a dibujar, primitiva, a partir de donde y cuantos
-	glBindVertexArray(0); //unbind
-
-	glBindVertexArray(vao5);
-	glDrawArrays(GL_LINE_STRIP, 0, size_5);//llamada a dibujar, primitiva, a partir de donde y cuantos
-	glBindVertexArray(0); //unbind
-
-	glBindVertexArray(vao6);
-	glDrawArrays(GL_LINE_STRIP, 0, size_6);//llamada a dibujar, primitiva, a partir de donde y cuantos
-	glBindVertexArray(0); //unbind
-
-	glBindVertexArray(vao7);
-	glDrawArrays(GL_LINE_STRIP, 0, size_7);//llamada a dibujar, primitiva, a partir de donde y cuantos
-	glBindVertexArray(0); //unbind 
-
+			glPointSize(7.0f);
+			glDrawArrays(GL_POINTS, 0, positions[i].size());
+		}
+		else {
+			glDrawArrays(GL_LINE_STRIP, 0, positions[i].size());//llamada a dibujar, primitiva, a partir de donde y cuantos
+		}
+		glBindVertexArray(0); //unbind
+	}
 
 }
 
@@ -179,53 +106,14 @@ std::vector<cgmath::vec2> schene_chaikin::calculate_chaikin(std::vector<cgmath::
 }
 
 void schene_chaikin::createVao(int i, std::vector<cgmath::vec2> position) {
-	if (i == 1) {
-		//Crea un identificador y lo guarda en vao
-		glGenVertexArrays(i, &vao0);
-		glBindVertexArray(vao0); //se trabajara con el siguiente vao
-	}
-	else if (i == 2) {
-		//Crea un identificador y lo guarda en vao
-		glGenVertexArrays(i, &vao1);
-		glBindVertexArray(vao1); //se trabajara con el siguiente vao
-	}
-	else if (i == 3) {
-		//Crea un identificador y lo guarda en vao
-		glGenVertexArrays(i, &vao2);
-		glBindVertexArray(vao2); //se trabajara con el siguiente vao
-	}
-	else if (i == 4) {
-		//Crea un identificador y lo guarda en vao
-		glGenVertexArrays(i, &vao3);
-		glBindVertexArray(vao3); //se trabajara con el siguiente vao
-	}
-	else if (i == 5) {
-		//Crea un identificador y lo guarda en vao
-		glGenVertexArrays(i, &vao4);
-		glBindVertexArray(vao4); //se trabajara con el siguiente vao
-	}
-	else if (i == 6) {
-		//Crea un identificador y lo guarda en vao
-		glGenVertexArrays(i, &vao5);
-		glBindVertexArray(vao5); //se trabajara con el siguiente vao
-	}
-	else if (i == 7) {
-		//Crea un identificador y lo guarda en vao
-		glGenVertexArrays(i, &vao6);
-		glBindVertexArray(vao6); //se trabajara con el siguiente vao
-	}
-	else if (i == 8) {
-		//Crea un identificador y lo guarda en vao
-		glGenVertexArrays(i, &vao7);
-		glBindVertexArray(vao7); //se trabajara con el siguiente vao
-	}
 
+	//Crea un identificador y lo guarda en vao
+	glGenVertexArrays(i, &vaos[i-1]);
+	glBindVertexArray(vaos[i-1]); //se trabajara con el siguiente vao
 
 	glGenBuffers(1, &positionsVBO); //Crea un identificador para el VBO, y guarda el id
 	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO); //quiero trabajar con el buffer positions VBO
 
-	glGenBuffers(i, &ebo);
-	glBindBuffer(GL_ARRAY_BUFFER, ebo);
 	//crea la memoria del buffer, especifica los datos y la manda al GPU, G_DYNAMIC_DRAW es un hint pero openFl decide si hacerte caso o no
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * position.size(), position.data(), GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);//prendo al atributo 0 
@@ -246,7 +134,8 @@ std::vector<cgmath::vec2> schene_chaikin::createCabelloIzquierdo() {
 
 	std::vector<cgmath::vec2> positions;
 
-	positions.push_back(cgmath::vec2(0.0f, 0.15f));
+	positions.push_back(cgmath::vec2(0.0f, 0.13f));
+	positions.push_back(cgmath::vec2(0.0f, 0.13f));
 	positions.push_back(cgmath::vec2(-0.3f, 0.5f));
 	positions.push_back(cgmath::vec2(-0.5f, 0.6f));
 	positions.push_back(cgmath::vec2(-0.65f, 0.65f)); //primer punta
@@ -304,8 +193,8 @@ std::vector<cgmath::vec2> schene_chaikin::createCabelloIzquierdo() {
 std::vector<cgmath::vec2> schene_chaikin::createCabelloDerecho(){
 
 	std::vector<cgmath::vec2> positions;
-
-	positions.push_back(cgmath::vec2(0.05f, 0.1f)); //primer punta
+	positions.push_back(cgmath::vec2(0.1f, 0.03f));
+	positions.push_back(cgmath::vec2(0.12f, 0.13f)); //primer punta
 	positions.push_back(cgmath::vec2(0.22f, 0.4f));
 	positions.push_back(cgmath::vec2(0.5f, 0.65f));
 
@@ -350,14 +239,10 @@ std::vector<cgmath::vec2> schene_chaikin::createOrejaIzquierdo() {
 
 	positions.push_back(cgmath::vec2(-0.6f, -0.5f));
 	positions.push_back(cgmath::vec2(-0.6f, -0.5f));
-	positions.push_back(cgmath::vec2(-0.65f, -0.5f));
-	positions.push_back(cgmath::vec2(-0.66f, -0.52f));
+	positions.push_back(cgmath::vec2(-0.66f, -0.50f));
 	positions.push_back(cgmath::vec2(-0.66f, -0.56f));
-	positions.push_back(cgmath::vec2(-0.64f, -0.58f));
 	positions.push_back(cgmath::vec2(-0.62f, -0.59f));
-	positions.push_back(cgmath::vec2(-0.61f, -0.6f));
 	positions.push_back(cgmath::vec2(-0.6f, -0.59f));
-	positions.push_back(cgmath::vec2(-0.58f, -0.58f));
 	positions.push_back(cgmath::vec2(-0.56, -0.55f));
 	positions.push_back(cgmath::vec2(-0.56, -0.55f));
 	return positions;
@@ -376,7 +261,6 @@ std::vector<cgmath::vec2> schene_chaikin::createOrejaDerecho() {
 	positions.push_back(cgmath::vec2(0.8f, -0.2f));
 	positions.push_back(cgmath::vec2(0.8f, -0.23f));
 	positions.push_back(cgmath::vec2(0.78f, -0.25f));
-	positions.push_back(cgmath::vec2(0.77f, -0.26f));
 	positions.push_back(cgmath::vec2(0.73f, -0.26f));
 	positions.push_back(cgmath::vec2(0.71f, -0.24f));
 	positions.push_back(cgmath::vec2(0.7f, -0.25f));
@@ -413,20 +297,25 @@ std::vector<cgmath::vec2> schene_chaikin::createCabezaInferior_B()
 	return positions;
 }
 
-std::vector<cgmath::vec2> schene_chaikin::createCabezaSuperior()
+std::vector<cgmath::vec2> schene_chaikin::createCabezaSuperior_B()
 {
 	std::vector<cgmath::vec2> positions;
 	positions.push_back(cgmath::vec2(-0.6f, -0.5f));
 	positions.push_back(cgmath::vec2(-0.6f, -0.5f));
 	positions.push_back(cgmath::vec2(-0.5f, -0.32f));
-	positions.push_back(cgmath::vec2(-0.35f, -0.15f));
-	positions.push_back(cgmath::vec2(-0.2f, -0.02f));
-	positions.push_back(cgmath::vec2(0.12f, 0.03f));
-	positions.push_back(cgmath::vec2(0.25f, 0.02f));
+	positions.push_back(cgmath::vec2(-0.5f, -0.32f));
+	return positions;
+}
+std::vector<cgmath::vec2> schene_chaikin::createCabezaSuperior()
+{
+	std::vector<cgmath::vec2> positions;
+	positions.push_back(cgmath::vec2(-0.4f, -0.2f));
+	positions.push_back(cgmath::vec2(-0.4f, -0.2f));
+	positions.push_back(cgmath::vec2(-0.3f, -0.1f));
+	positions.push_back(cgmath::vec2(-0.1f, -0.01f));
+	positions.push_back(cgmath::vec2(0.1f, 0.03f));
+	positions.push_back(cgmath::vec2(0.1f, 0.03f));
 	positions.push_back(cgmath::vec2(0.35f, 0.01f));
-	positions.push_back(cgmath::vec2(0.4f, 0.0f));
-	positions.push_back(cgmath::vec2(0.6f, -0.08f));
-	positions.push_back(cgmath::vec2(0.65f, -0.12f));
 	positions.push_back(cgmath::vec2(0.7f, -0.15f));
 	positions.push_back(cgmath::vec2(0.7f, -0.15f));
 	return positions;
@@ -440,6 +329,154 @@ std::vector<cgmath::vec2> schene_chaikin::createCuello()
 	positions.push_back(cgmath::vec2(0.09f, -0.62f));
 	positions.push_back(cgmath::vec2(0.14f, -0.58f));
 	positions.push_back(cgmath::vec2(0.14f, -0.46f));
+
+	return positions;
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createGorro()
+{
+	std::vector<cgmath::vec2> positions;
+
+	positions.push_back(cgmath::vec2(-0.1f, -0.01f)); //base
+	positions.push_back(cgmath::vec2(-0.1f, -0.01f));
+	positions.push_back(cgmath::vec2(0.1f, 0.03f));
+	positions.push_back(cgmath::vec2(0.1f, 0.03f));
+
+	positions.push_back(cgmath::vec2(0.12f, 0.13f));
+	positions.push_back(cgmath::vec2(0.12f, 0.13f));
+	positions.push_back(cgmath::vec2(0.11f, 0.13f));
+
+	positions.push_back(cgmath::vec2(0.1f, 0.14f)); //bolita
+	positions.push_back(cgmath::vec2(0.095f, 0.15f));
+	positions.push_back(cgmath::vec2(0.08f, 0.16f));
+	positions.push_back(cgmath::vec2(0.06f, 0.16f)); 
+	positions.push_back(cgmath::vec2(0.05f, 0.15f));
+	positions.push_back(cgmath::vec2(0.05f, 0.14f));  //bolita
+
+	positions.push_back(cgmath::vec2(0.03f, 0.14f)); //bajada
+	positions.push_back(cgmath::vec2(0.01f, 0.13f));
+	positions.push_back(cgmath::vec2(0.0f, 0.12f));
+	positions.push_back(cgmath::vec2(-0.04f, 0.08f));
+	positions.push_back(cgmath::vec2(-0.04f, 0.05f));
+	positions.push_back(cgmath::vec2(-0.05f, 0.05f)); 
+	positions.push_back(cgmath::vec2(-0.1f, -0.01f));
+	positions.push_back(cgmath::vec2(-0.1f, -0.01f));
+
+	return positions;
+
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createGorro_centro()
+{
+	std::vector<cgmath::vec2> positions;
+
+	positions.push_back(cgmath::vec2(-0.065f, 0.05f));
+	positions.push_back(cgmath::vec2(0.0f, 0.06f));
+	positions.push_back(cgmath::vec2(0.06f, 0.05f));
+	positions.push_back(cgmath::vec2(0.09f, 0.02f));
+	positions.push_back(cgmath::vec2(0.09f, 0.02f));
+
+	return positions;
+
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createOjoIzquierdo()
+{
+	std::vector<cgmath::vec2> positions;
+
+	positions.push_back(cgmath::vec2(-0.38f, -0.2f));
+	positions.push_back(cgmath::vec2(-0.38f, -0.2f));
+	positions.push_back(cgmath::vec2(-0.48f, -0.24f));
+	positions.push_back(cgmath::vec2(-0.5f, -0.32f));
+	positions.push_back(cgmath::vec2(-0.45f, -0.38f));
+	positions.push_back(cgmath::vec2(-0.36f, -0.38f));
+	positions.push_back(cgmath::vec2(-0.3f, -0.34f));
+	positions.push_back(cgmath::vec2(-0.27f, -0.3f));
+	positions.push_back(cgmath::vec2(-0.28f, -0.24f));
+	positions.push_back(cgmath::vec2(-0.35f, -0.2f));
+
+	return positions;
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createOjoDerecho()
+{
+	std::vector<cgmath::vec2> positions;
+
+	positions.push_back(cgmath::vec2(0.22f, -0.02f));
+	positions.push_back(cgmath::vec2(0.16f, -0.1f));
+	positions.push_back(cgmath::vec2(0.2f, -0.17f));
+	positions.push_back(cgmath::vec2(0.32f, -0.19f));
+	positions.push_back(cgmath::vec2(0.42f, -0.12f));
+	positions.push_back(cgmath::vec2(0.42f, -0.065f));
+	positions.push_back(cgmath::vec2(0.34f, 0.0f));
+
+	return positions;
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createNariz()
+{
+	std::vector<cgmath::vec2> positions;
+
+	positions.push_back(cgmath::vec2(-0.06f, -0.15f));
+	positions.push_back(cgmath::vec2(-0.13f, -0.15f));
+	positions.push_back(cgmath::vec2(-0.18f, -0.18f));
+	positions.push_back(cgmath::vec2(-0.22f, -0.25f));
+	positions.push_back(cgmath::vec2(-0.18f, -0.35f));
+	positions.push_back(cgmath::vec2(-0.06f, -0.35f));
+	positions.push_back(cgmath::vec2(-0.06f, -0.35f));
+
+	return positions;
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createLineaOjoIzquierdo()
+{
+	std::vector<cgmath::vec2> positions;
+
+	positions.push_back(cgmath::vec2(-0.49f, -0.32f));
+	positions.push_back(cgmath::vec2(-0.49f, -0.32f));
+	positions.push_back(cgmath::vec2(-0.42f, -0.26f));
+	positions.push_back(cgmath::vec2(-0.36f, -0.25f)); //linea ojo
+	positions.push_back(cgmath::vec2(-0.295f, -0.24f));
+	positions.push_back(cgmath::vec2(-0.295f, -0.235f));
+
+	return positions;
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createLineaOjoDerecho()
+{
+	std::vector<cgmath::vec2> positions;
+
+	positions.push_back(cgmath::vec2(0.17, -0.1f));
+	positions.push_back(cgmath::vec2(0.17, -0.1f));
+	positions.push_back(cgmath::vec2(0.22f, -0.08f)); //linea ojo
+	positions.push_back(cgmath::vec2(0.32f, -0.06f));
+	positions.push_back(cgmath::vec2(0.41f, -0.07f));
+	positions.push_back(cgmath::vec2(0.41f, -0.07f));
+
+	return positions;
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createBoca(){
+
+	std::vector<cgmath::vec2> positions;
+	
+	positions.push_back(cgmath::vec2(0.26, -0.36f));
+	positions.push_back(cgmath::vec2(0.32, -0.3f));
+	positions.push_back(cgmath::vec2(0.36f, -0.24f));
+	positions.push_back(cgmath::vec2(0.32f, -0.22f));
+
+	return positions;
+}
+
+std::vector<cgmath::vec2> schene_chaikin::createPupila(int i) {
+	std::vector<cgmath::vec2> positions;
+	//izquierda
+	if (i == 0) {
+		positions.push_back(cgmath::vec2(-0.38f, -0.27f));
+	}//derecha
+	else if (i == 1) {
+		positions.push_back(cgmath::vec2(0.285f, -0.09f));
+	}
 
 	return positions;
 }
