@@ -88,10 +88,10 @@ void scene_manager::initialize()
 	sceneList.push_back(std::move(scene1));
 
 	std::unique_ptr<scene> scene2(new scene_primitives);
-	sceneList.push_back(std::move(scene2));
+	sceneList.push_back(std::move(scene2)); */
 
-	/*std::unique_ptr<scene> scene_conchoid(new scene_conchoid);
-	sceneList.push_back(std::move(scene_conchoid)); */
+	std::unique_ptr<scene> scene_conchoid(new scene_conchoid);
+	sceneList.push_back(std::move(scene_conchoid));
 
 	std::unique_ptr<scene> schene_chaikin(new schene_chaikin);
 	sceneList.push_back(std::move(schene_chaikin));

@@ -13,7 +13,7 @@ public:
 	void reset() {}
 	void mainLoop();
 	void resize(int width, int height) {}
-	void normalKeysDown(unsigned char key) {}
+	void normalKeysDown(unsigned char key);
 	void normalKeysUp(unsigned char key) {}
 	void specialKeys(int key) {}
 	void passiveMotion(int x, int y) {}
@@ -37,15 +37,19 @@ public:
 	std::vector<cgmath::vec2> createBoca();
 	std::vector<cgmath::vec2> createNariz();
 	std::vector<cgmath::vec2> createPupila(int i);
+	void lineStripFigure();
+	void linesFigure();
 
 private:
 
 	//Este es el manager de memoria
-	GLuint vaos[50];
+	GLuint vaos[100];
 
 	//Buffer con atributo
 	GLuint positionsVBO;
 	GLfloat Qx, Rx, Qy, Ry;
 
 	std::vector<std::vector<cgmath::vec2>> positions;
+
+	GLenum primitiveType;
 };

@@ -4,49 +4,18 @@
 #include <vector>
 
 
-int size = 19;
-
-
 //Se manda a llamar una vez cuando se inicia la aplicacion
 void schene_chaikin::init() {
-	//Pelo Izquierdo
-	positions.push_back(schene_chaikin::calculate_chaikin(createCabelloIzquierdo()));
-	//Pelo Derecho
-	positions.push_back(schene_chaikin::calculate_chaikin(createCabelloDerecho()));
-	//Oreja Izquierda
-	positions.push_back(schene_chaikin::calculate_chaikin(createOrejaIzquierdo()));
-	//Oreja Derecha
-	positions.push_back(schene_chaikin::calculate_chaikin(createOrejaDerecho()));
-	//Cara superior
-	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaSuperior()));
-	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaSuperior_B()));
-	// Cara Inferior
-	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaInferior()));
-	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaInferior_B()));
-	//Cuello
-	positions.push_back(createCuello());
-	//Gorro
-	positions.push_back(schene_chaikin::calculate_chaikin(createGorro()));
-	positions.push_back(schene_chaikin::calculate_chaikin(createGorro_centro()));
-	//Ojo izquierdo
-	positions.push_back(schene_chaikin::calculate_chaikin(createOjoIzquierdo()));
-	positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoIzquierdo()));
-	//Ojo Derecha
-	positions.push_back(schene_chaikin::calculate_chaikin(createOjoDerecho()));
-	positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoDerecho()));
-	//Nariz
-	positions.push_back(schene_chaikin::calculate_chaikin(createNariz()));
-	//Boca
-	positions.push_back(schene_chaikin::calculate_chaikin(createBoca()));
-	//Pupila Izquierda
-	positions.push_back(createPupila(0));
-	//Pupila Derecha
-	positions.push_back(createPupila(1));
 
-	for (int i = 1; i <= size; i++)
+	linesFigure();
+	lineStripFigure();
+
+	for (int i = 1; i <= positions.size(); i++)
 	{
 		createVao(i, positions[i-1]);
 	}
+
+	primitiveType = GL_LINES;
 
 }
 
@@ -65,20 +34,35 @@ void schene_chaikin::mainLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (int i = 0; i < size; i++)
-	{
-		glBindVertexArray(vaos[i]);
-		if (positions[i].size() == 1) {
+	if (primitiveType == GL_LINES) {
+		for (int i = 0; i < (positions.size() / 2); i++)
+		{
+			glBindVertexArray(vaos[i]);
+			if (positions[i].size() == 1) {
 
-			glPointSize(7.0f);
-			glDrawArrays(GL_POINTS, 0, positions[i].size());
+				glPointSize(7.0f);
+				glDrawArrays(GL_POINTS, 0, positions[i].size());
+			}
+			else {
+				glDrawArrays(primitiveType, 0, positions[i].size());//llamada a dibujar, primitiva, a partir de donde y cuantos
+			}
+			glBindVertexArray(0); //unbind 
 		}
-		else {
-			glDrawArrays(GL_LINE_STRIP, 0, positions[i].size());//llamada a dibujar, primitiva, a partir de donde y cuantos
-		}
-		glBindVertexArray(0); //unbind 
-	} 
+	} else if (primitiveType == GL_LINE_STRIP) {
+		for (int i = (positions.size() / 2); i < positions.size(); i++)
+		{
+			glBindVertexArray(vaos[i]);
+			if (positions[i].size() == 1) {
 
+				glPointSize(7.0f);
+				glDrawArrays(GL_POINTS, 0, positions[i].size());
+			}
+			else {
+				glDrawArrays(primitiveType, 0, positions[i].size());//llamada a dibujar, primitiva, a partir de donde y cuantos
+			}
+			glBindVertexArray(0); //unbind 
+		}
+	}
 }
 
 std::vector<cgmath::vec2> schene_chaikin::calculate_chaikin(std::vector<cgmath::vec2> positions) {
@@ -107,7 +91,6 @@ std::vector<cgmath::vec2> schene_chaikin::calculate_chaikin(std::vector<cgmath::
 
 void schene_chaikin::createVao(int i, std::vector<cgmath::vec2> position) {
 
-	std::cout << position.size() << std::endl;
 	//Crea un identificador y lo guarda en vao
 	glGenVertexArrays(i, &vaos[i-1]);
 	glBindVertexArray(vaos[i-1]); //se trabajara con el siguiente vao
@@ -480,4 +463,84 @@ std::vector<cgmath::vec2> schene_chaikin::createPupila(int i) {
 	}
 
 	return positions;
+}
+
+void schene_chaikin::lineStripFigure()
+{
+	//Pelo Izquierdo
+	positions.push_back(schene_chaikin::calculate_chaikin(createCabelloIzquierdo()));
+	//Pelo Derecho
+	positions.push_back(schene_chaikin::calculate_chaikin(createCabelloDerecho()));
+	//Oreja Izquierda
+	positions.push_back(schene_chaikin::calculate_chaikin(createOrejaIzquierdo()));
+	//Oreja Derecha
+	positions.push_back(schene_chaikin::calculate_chaikin(createOrejaDerecho()));
+	//Cara superior
+	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaSuperior()));
+	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaSuperior_B()));
+	// Cara Inferior
+	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaInferior()));
+	positions.push_back(schene_chaikin::calculate_chaikin(createCabezaInferior_B()));
+	//Cuello
+	positions.push_back(createCuello());
+	//Gorro
+	positions.push_back(schene_chaikin::calculate_chaikin(createGorro()));
+	positions.push_back(schene_chaikin::calculate_chaikin(createGorro_centro()));
+	//Ojo izquierdo
+	positions.push_back(schene_chaikin::calculate_chaikin(createOjoIzquierdo()));
+	positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoIzquierdo()));
+	//Ojo Derecha
+	positions.push_back(schene_chaikin::calculate_chaikin(createOjoDerecho()));
+	positions.push_back(schene_chaikin::calculate_chaikin(createLineaOjoDerecho()));
+	//Nariz
+	positions.push_back(schene_chaikin::calculate_chaikin(createNariz()));
+	//Boca
+	positions.push_back(schene_chaikin::calculate_chaikin(createBoca()));
+	//Pupila Izquierda
+	positions.push_back(createPupila(0));
+	//Pupila Derecha
+	positions.push_back(createPupila(1));
+}
+
+void schene_chaikin::linesFigure()
+{
+	//Pelo Izquierdo
+	positions.push_back(createCabelloIzquierdo());
+	//Pelo Derecho
+	positions.push_back(createCabelloDerecho());
+	//Oreja Izquierda
+	positions.push_back(createOrejaIzquierdo());
+	//Oreja Derecha
+	positions.push_back(createOrejaDerecho());
+	//Cara superior
+	positions.push_back(createCabezaSuperior());
+	positions.push_back(createCabezaSuperior_B());
+	// Cara Inferior
+	positions.push_back(createCabezaInferior());
+	positions.push_back(createCabezaInferior_B());
+	//Cuello
+	positions.push_back(createCuello());
+	//Gorro
+	positions.push_back(createGorro());
+	positions.push_back(createGorro_centro());
+	//Ojo izquierdo
+	positions.push_back(createOjoIzquierdo());
+	positions.push_back(createLineaOjoIzquierdo());
+	//Ojo Derecha
+	positions.push_back(createOjoDerecho());
+	positions.push_back(createLineaOjoDerecho());
+	//Nariz
+	positions.push_back(createNariz());
+	//Boca
+	positions.push_back(createBoca());
+	//Pupila Izquierda
+	positions.push_back(createPupila(0));
+	//Pupila Derecha
+	positions.push_back(createPupila(1));
+}
+
+void schene_chaikin::normalKeysDown(unsigned char key)
+{
+	if (key == '1') primitiveType = GL_LINES;
+	if (key == '2') primitiveType = GL_LINE_STRIP;
 }
