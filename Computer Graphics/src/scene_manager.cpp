@@ -10,6 +10,7 @@
 #include "scene_primitives.h"
 #include "schene_chaikin.h"
 #include "scene_conchoid.h"
+#include "scene_vertex.h"
 
 #include "time.h"
 
@@ -23,7 +24,8 @@ void scene_manager::start(int argc, char* argv[], const std::string& name, int w
 
 	// Freeglut init
 	glutInit(&argc, argv);
-	glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
+	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 	glutInitWindowSize(width, height);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
@@ -38,6 +40,7 @@ void scene_manager::start(int argc, char* argv[], const std::string& name, int w
 	glutPassiveMotionFunc(passiveMotion);
 
 	// Glew init
+	glewExperimental = true;
 	glewInit();
 
 	// OpenGL init
@@ -84,17 +87,20 @@ void scene_manager::initialize()
 	//std::unique_ptr<scene> somescene(new scene_project);
 	//sceneList.push_back(std::move(somescene));
 	
-	/*std::unique_ptr<scene> scene1(new scene_compatibility);
+	std::unique_ptr<scene> scene1(new scene_compatibility);
 	sceneList.push_back(std::move(scene1));
 
 	std::unique_ptr<scene> scene2(new scene_primitives);
-	sceneList.push_back(std::move(scene2)); */
+	sceneList.push_back(std::move(scene2));  
 
 	std::unique_ptr<scene> scene_conchoid(new scene_conchoid);
-	sceneList.push_back(std::move(scene_conchoid));
+	sceneList.push_back(std::move(scene_conchoid)); 
 
 	std::unique_ptr<scene> schene_chaikin(new schene_chaikin);
-	sceneList.push_back(std::move(schene_chaikin));
+	sceneList.push_back(std::move(schene_chaikin)); 
+
+	/* std::unique_ptr<scene> scene_vertex(new scene_vertex);
+	sceneList.push_back(std::move(scene_vertex)); */
 
 	for (auto& s : sceneList)
 		s->init();

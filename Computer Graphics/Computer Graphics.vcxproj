@@ -72,6 +72,10 @@
     <ClInclude Include="include\scene_vertex.h" />
     <ClInclude Include="include\schene_chaikin.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\grid.vert" />
+    <None Include="shaders\solid_color.frag" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

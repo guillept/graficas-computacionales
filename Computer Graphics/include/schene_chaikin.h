@@ -17,6 +17,7 @@ public:
 	void normalKeysUp(unsigned char key) {}
 	void specialKeys(int key) {}
 	void passiveMotion(int x, int y) {}
+
 	std::vector<cgmath::vec2> calculate_chaikin(std::vector<cgmath::vec2> positions);
 	void createVao(int i, std::vector<cgmath::vec2> position);
 	std::vector<cgmath::vec2> createCabelloIzquierdo();
@@ -37,8 +38,10 @@ public:
 	std::vector<cgmath::vec2> createBoca();
 	std::vector<cgmath::vec2> createNariz();
 	std::vector<cgmath::vec2> createPupila(int i);
+	std::vector<cgmath::vec2> createGorroSuperior();
 	void lineStripFigure();
 	void linesFigure();
+	void draw(int i, GLenum primitiveType);
 
 private:
 
@@ -50,6 +53,6 @@ private:
 	GLfloat Qx, Rx, Qy, Ry;
 
 	std::vector<std::vector<cgmath::vec2>> positions;
-
-	GLenum primitiveType;
+	bool displayLines = true, displayLineStrip = true;
+	
 };
