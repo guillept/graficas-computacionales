@@ -48,8 +48,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\scene_circle_grid.cpp" />
     <ClCompile Include="src\scene_compatibility.cpp" />
     <ClCompile Include="src\scene_conchoid.cpp" />
+    <ClCompile Include="src\scene_fragment.cpp" />
     <ClCompile Include="src\scene_manager.cpp" />
     <ClCompile Include="src\scene_primitives.cpp" />
     <ClCompile Include="src\scene_vertex.cpp" />
@@ -65,15 +67,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\scene.h" />
+    <ClInclude Include="include\scene_circle_grid.h" />
     <ClInclude Include="include\scene_compatibility.h" />
     <ClInclude Include="include\scene_conchoid.h" />
+    <ClInclude Include="include\scene_fragment.h" />
     <ClInclude Include="include\scene_manager.h" />
     <ClInclude Include="include\scene_primitives.h" />
     <ClInclude Include="include\scene_vertex.h" />
     <ClInclude Include="include\schene_chaikin.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\circle_grid.vert" />
     <None Include="shaders\grid.vert" />
+    <None Include="shaders\simple_pass.vert" />
     <None Include="shaders\solid_color.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

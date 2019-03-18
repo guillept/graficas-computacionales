@@ -11,6 +11,9 @@
 #include "schene_chaikin.h"
 #include "scene_conchoid.h"
 #include "scene_vertex.h"
+#include "scene_fragment.h"
+#include "scene_circle_grid.h"
+
 
 #include "time.h"
 
@@ -87,7 +90,7 @@ void scene_manager::initialize()
 	//std::unique_ptr<scene> somescene(new scene_project);
 	//sceneList.push_back(std::move(somescene));
 	
-	std::unique_ptr<scene> scene1(new scene_compatibility);
+	/* std::unique_ptr<scene> scene1(new scene_compatibility);
 	sceneList.push_back(std::move(scene1));
 
 	std::unique_ptr<scene> scene2(new scene_primitives);
@@ -99,8 +102,16 @@ void scene_manager::initialize()
 	std::unique_ptr<scene> schene_chaikin(new schene_chaikin);
 	sceneList.push_back(std::move(schene_chaikin)); 
 
-	/* std::unique_ptr<scene> scene_vertex(new scene_vertex);
-	sceneList.push_back(std::move(scene_vertex)); */
+	std::unique_ptr<scene> scene_vertex(new scene_vertex);
+	sceneList.push_back(std::move(scene_vertex));
+
+	std::unique_ptr<scene> scene_fragment(new scene_fragment);
+	sceneList.push_back(std::move(scene_fragment));
+
+	*/
+
+	std::unique_ptr<scene> scene_circle_grid(new scene_circle_grid);
+	sceneList.push_back(std::move(scene_circle_grid));
 
 	for (auto& s : sceneList)
 		s->init();

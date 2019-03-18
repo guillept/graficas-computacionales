@@ -12,14 +12,17 @@ void main()
   
   float u = x / (width - 1.0f);
   float v = y / (width - 1.0f);
-  
+    
+  //Desfamiento
+  //desfazamiento + [x = diferente] * r
   float xOffset = cos(time + y * 0.2f) * 0.1f;
   float yOffset = cos(time + x * 0.3f) * 0.2f;
   
+   //Acomodar en los cuadrantes
   float ux = u * 2.0f - 1.0f + xOffset;
   float vy = v * 2.0f - 1.0f + yOffset;
   
-  vec2 xy = vec2(ux, vy) * 1.2f;
+  vec2 xy = vec2(ux, vy) * 1.2f; //se puede crear vec4 con vectores 2 -> vec4(xy, 0.0, 1.0);
   
   gl_Position = vec4(xy, 0.0f, 1.0f);
   gl_PointSize = 20.0f;

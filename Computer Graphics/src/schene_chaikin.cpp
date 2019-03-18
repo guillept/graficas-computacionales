@@ -76,7 +76,7 @@ std::vector<cgmath::vec2> schene_chaikin::calculate_chaikin(std::vector<cgmath::
 
 void schene_chaikin::createVao(int i, std::vector<cgmath::vec2> position) {
 
-	glGenVertexArrays(i, &vaos[i-1]);
+	glGenVertexArrays(1, &vaos[i-1]);
 	glBindVertexArray(vaos[i-1]);
 	glGenBuffers(1, &positionsVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
