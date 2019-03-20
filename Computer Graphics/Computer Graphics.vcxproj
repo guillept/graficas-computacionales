@@ -48,6 +48,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\scene_circle.cpp" />
     <ClCompile Include="src\scene_circle_grid.cpp" />
     <ClCompile Include="src\scene_compatibility.cpp" />
     <ClCompile Include="src\scene_conchoid.cpp" />
@@ -68,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\scene.h" />
+    <ClInclude Include="include\scene_circle.h" />
     <ClInclude Include="include\scene_circle_grid.h" />
     <ClInclude Include="include\scene_compatibility.h" />
     <ClInclude Include="include\scene_conchoid.h" />
@@ -79,6 +81,7 @@
     <ClInclude Include="include\schene_chaikin.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\circle.frag" />
     <None Include="shaders\circle_grid.vert" />
     <None Include="shaders\grid.vert" />
     <None Include="shaders\simple_pass.vert" />

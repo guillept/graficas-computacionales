@@ -14,7 +14,7 @@
 #include "scene_fragment.h"
 #include "scene_circle_grid.h"
 #include "scene_sphere.h"
-
+#include "scene_circle.h"
 
 #include "time.h"
 
@@ -107,15 +107,17 @@ void scene_manager::initialize()
 	sceneList.push_back(std::move(scene_vertex));
 
 	std::unique_ptr<scene> scene_fragment(new scene_fragment);
-	sceneList.push_back(std::move(scene_fragment));
+	sceneList.push_back(std::move(scene_fragment)); */
 
-	*/
-
-	std::unique_ptr<scene> scene_circle_grid(new scene_circle_grid);
+	/*std::unique_ptr<scene> scene_circle_grid(new scene_circle_grid);
 	sceneList.push_back(std::move(scene_circle_grid));
 
 	std::unique_ptr<scene> scene_sphere(new scene_sphere);
-	sceneList.push_back(std::move(scene_sphere));
+	sceneList.push_back(std::move(scene_sphere)); */
+
+	std::unique_ptr<scene> scene_circle(new scene_circle);
+	sceneList.push_back(std::move(scene_circle));
+	
 	
 	for (auto& s : sceneList)
 		s->init();
