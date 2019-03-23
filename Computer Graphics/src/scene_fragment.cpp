@@ -167,7 +167,7 @@ void scene_fragment::awake()
 
 void scene_fragment::sleep()
 {
-	glClearColor(1.0f, 1.0f, 0.5f, 1.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glDisable(GL_PROGRAM_POINT_SIZE);
 }
 

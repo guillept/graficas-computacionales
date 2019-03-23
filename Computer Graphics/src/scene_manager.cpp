@@ -110,7 +110,6 @@ void scene_manager::initialize()
 	std::unique_ptr<scene> scene_fragment(new scene_fragment);
 	sceneList.push_back(std::move(scene_fragment)); */
 
-	/*
 	std::unique_ptr<scene> scene_circle_grid(new scene_circle_grid);
 	sceneList.push_back(std::move(scene_circle_grid));
 
@@ -118,7 +117,7 @@ void scene_manager::initialize()
 	sceneList.push_back(std::move(scene_sphere)); 
 
 	std::unique_ptr<scene> scene_circle(new scene_circle);
-	sceneList.push_back(std::move(scene_circle)); */
+	sceneList.push_back(std::move(scene_circle));
 	
 	std::unique_ptr<scene> scene_cube(new scene_cube);
 	sceneList.push_back(std::move(scene_cube));
