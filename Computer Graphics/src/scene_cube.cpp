@@ -4,7 +4,6 @@
 #include "time.h"
 
 #include <iostream>
-#include <vector>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -18,103 +17,22 @@ scene_cube::~scene_cube()
 
 void scene_cube::init()
 {
-	std::vector<cgmath::vec3> positions;
-	std::vector<cgmath::vec3> colors;
 
 	//Matriz de modelo translation*rotation*scale
 	float iTime = time::elapsed_time().count();
 
-	rotZ = cgmath::mat4(
-		cgmath::vec4(cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0., 0.),
-		cgmath::vec4(-sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0., 0.),
-		cgmath::vec4(0., 0., 1., 0.),
-		cgmath::vec4(0., 0., 0., 1.)
-	);
-
-	rotY = cgmath::mat4(
-		cgmath::vec4(cos(radians(60.)*iTime), 0., -sin(radians(60.)*iTime), 0.),
-		cgmath::vec4(0., 1., 0., 0.),
-		cgmath::vec4(sin(radians(60.)*iTime), 0., cos(radians(60.)*iTime), 0.),
-		cgmath::vec4(0., 0., 0., 1.)
-	);
-
-	rotX = cgmath::mat4(
-		cgmath::vec4(1., 0., 0., 0.),
-		cgmath::vec4(0., cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0.),
-		cgmath::vec4(0., -sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0.),
-		cgmath::vec4(0., 0., 0., 1.)
-	);
-
-	scale = cgmath::mat4(
-		cgmath::vec4(1., 0., 0., 0.),
-		cgmath::vec4(0., 1., 0., 0.),
-		cgmath::vec4(0., 0., 1., 0.),
-		cgmath::vec4(0., 0., 0., 1.)
-	);
-
-	trans = cgmath::mat4(
-		cgmath::vec4(1., 0., 0., 0.),
-		cgmath::vec4(0., 1., 0., 0.),
-		cgmath::vec4(0., 0., 1., 0.),
-		cgmath::vec4(0., 0., 0., 1.)
-	);
-
-
-	cgmath::mat4 matrizDeCamara(
-		cgmath::vec4(1., 0., 0., 0.),
-		cgmath::vec4(0., 1., 0., 0.),
-		cgmath::vec4(0., 0., 1., 0.),
-		cgmath::vec4(0., 0., 10., 1.)
-	);
-
-	float near = 1.0f;
-	float far = 1000.f;
-	float fov = radians(60.);
+	rotZ = rotateZ(iTime);
+	rotY = rotateY(iTime);
+	rotX = rotateX(iTime);
+	scale = scaleM();
+	trans = translation();
+	cgmath::mat4 matrizDeCamara = camera();
 
 	Model = rotX * rotY * rotZ * scale * trans;
 	View = cgmath::mat4::inverse(matrizDeCamara);
-	Projection = cgmath::mat4(
-		cgmath::vec4(1. / (aspect*tan(fov / 2.)), 0., 0., 0.),
-		cgmath::vec4(0., 1. / (tan(fov / 2.)), 0., 0.),
-		cgmath::vec4(0., 0., -((far + near) / (far - near)), -1.),
-		cgmath::vec4(0., 0., -((2 * far*near) / (far - near)), 1.)
-	);
+	Projection = projection();
 
-	//Front
-	positions.push_back(cgmath::vec3(-x, y, z)); //v1 - 0
-	positions.push_back(cgmath::vec3(-x, -y, z)); //v2 - 1 
-	positions.push_back(cgmath::vec3(x, -y, z)); //v3 - 2
-	positions.push_back(cgmath::vec3(x, y, z)); //v4 - 3
-
-	//Rigth
-	positions.push_back(cgmath::vec3(x, y, z)); //v4 - 4
-	positions.push_back(cgmath::vec3(x, -y, z)); //v3 - 5
-	positions.push_back(cgmath::vec3(x, -y, -z)); //v7 - 6
-	positions.push_back(cgmath::vec3(x, y, -z)); //v6 - 7
-
-	//Back
-	positions.push_back(cgmath::vec3(-x, y, -z)); //v5 - 8
-	positions.push_back(cgmath::vec3(-x, -y, -z)); //v8 - 9
-	positions.push_back(cgmath::vec3(x, -y, -z)); //v7 - 10
-	positions.push_back(cgmath::vec3(x, y, -z)); //v6 - 11
-
-	//Left
-	positions.push_back(cgmath::vec3(-x, y, z)); //v1 - 12
-	positions.push_back(cgmath::vec3(-x, -y, z)); //v2 - 13
-	positions.push_back(cgmath::vec3(-x, -y, -z)); //v8 - 14
-	positions.push_back(cgmath::vec3(-x, y, -z)); //v5 - 15
-
-	//Top
-	positions.push_back(cgmath::vec3(-x, y, -z)); //v5 - 16
-	positions.push_back(cgmath::vec3(-x, y, z)); //v1 - 17
-	positions.push_back(cgmath::vec3(x, y, z)); //v4 - 18
-	positions.push_back(cgmath::vec3(x, y, -z)); //v6 - 19
-
-	//Bottom
-	positions.push_back(cgmath::vec3(-x, -y, z)); //v2 - 20
-	positions.push_back(cgmath::vec3(x, -y, z)); //v3 - 21
-	positions.push_back(cgmath::vec3(x, -y, -z)); //v7 - 22
-	positions.push_back(cgmath::vec3(-x, -y, -z)); //v8 - 23
+	createCube();
 
 	std::vector<unsigned int> indices =
 	{
@@ -127,18 +45,20 @@ void scene_cube::init()
 
 	};
 
-	for (int i = 0; i < minimoNumeroVertices; i++)
-		colors.push_back(cgmath::vec3(1., 1., 1.)); //front
-	for (int i = 0; i < minimoNumeroVertices; i++)
-		colors.push_back(cgmath::vec3(1., 0.0, 0.0)); //right
-	for (int i = 0; i < minimoNumeroVertices; i++)
-		colors.push_back(cgmath::vec3(0.0, 1., 0.)); //back
-	for (int i = 0; i < minimoNumeroVertices; i++)
-		colors.push_back(cgmath::vec3(0.0, 0.0, 1.)); //left
-	for (int i = 0; i < minimoNumeroVertices; i++)
-		colors.push_back(cgmath::vec3(0.2, 0.2, 0.2)); //top
-	for (int i = 0; i < minimoNumeroVertices; i++)
-		colors.push_back(cgmath::vec3(0., 0., 0.)); //bottom
+	setColors();
+
+	cgmath::vec2 tex00 = cgmath::vec2(0.0, 0.0);
+	cgmath::vec2 tex10 = cgmath::vec2(1.0, 0.0);
+	cgmath::vec2 tex11 = cgmath::vec2(1.0, 1.0);
+	cgmath::vec2 tex01 = cgmath::vec2(0.0, 1.0);
+
+	for (int i = 0; i < 6; i++)
+	{
+		textura.push_back(tex01);
+		textura.push_back(tex11);
+		textura.push_back(tex10);
+		textura.push_back(tex00);
+	}
 
 	// Creacion y activacion del vao
 	glGenVertexArrays(1, &vao);
@@ -158,15 +78,59 @@ void scene_cube::init()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
 	// Creacion y configuracion del buffer del atributo de color
-	glGenBuffers(2, &colorsVBO);
+	glGenBuffers(1, &colorsVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec3) * colors.size(), colors.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	// Creacion y configuracion del buffer del atributo de textura
+	glGenBuffers(1, &texturasVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, texturasVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * textura.size(), textura.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glBindVertexArray(0); //unbind vao
 
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+	ilLoadImage("images/crate.png");
+
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //minificacion
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //magnificacion
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //Coordenda S
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //Coordenada T
+
+	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT),
+		ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0,
+		ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData()); //IL_IMAGE_TYPE
+
+	ilBindImage(0);
+	ilDeleteImages(1, &imageID);
+
+	//repetir cerdo
+
+	/*cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+
+	ambiental = 10 % * LightColor;
+
+	cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+
+	difusse = normalize(Light) * normalize(PixelNormal);
+	LightPosition = vec3();
+	PixelPosition = VertexPosition * Model;
+
+
+	R = reflect(-LightColor, PixelNormal);
+	CamaraPosition = cos(R, V) *  LightColor;
+	specular =
+		cgmath::vec3 phong = ambient + diffuse + specular * TextureColor;
+		*/
 	ifile shader_file;
 	shader_file.read("shaders/cube.vert");
 	std::string vertex_source = shader_file.get_contents();
@@ -221,13 +185,19 @@ void scene_cube::init()
 	// Asignar Buffer a variables de IN en VertexShader
 	glBindAttribLocation(shader_program, 0, "VertexPosition");
 	glBindAttribLocation(shader_program, 1, "InterpolatedColor");
-
+	glBindAttribLocation(shader_program, 2, "TexturePosition");
 	glLinkProgram(shader_program);
 
 	// Borramos los shaders, porque ya tenemos el ejecutable
 	glDeleteShader(vertex_shader);
 	glDeleteShader(fragment_shader);
+
 	glUseProgram(shader_program);
+	GLuint texture1_location = glGetUniformLocation(shader_program, "text1");
+	glUniform1i(texture1_location, 0);
+	GLuint texture2_location = glGetUniformLocation(shader_program, "text2");
+	glUniform1i(texture2_location, 1);
+
 	glUseProgram(0);
 
 }
@@ -248,26 +218,9 @@ void scene_cube::mainLoop()
 {
 	float iTime = time::elapsed_time().count();
 
-	rotZ = cgmath::mat4(
-		cgmath::vec4(cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0., 0.),
-		cgmath::vec4(-sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0., 0.),
-		cgmath::vec4(0., 0., 1., 0.),
-		cgmath::vec4(0., 0., 0., 1.)
-	);
-
-	rotY = cgmath::mat4(
-		cgmath::vec4(cos(radians(60.)*iTime), 0., -sin(radians(60.)*iTime), 0.),
-		cgmath::vec4(0., 1., 0., 0.),
-		cgmath::vec4(sin(radians(60.)*iTime), 0., cos(radians(60.)*iTime), 0.),
-		cgmath::vec4(0., 0., 0., 1.)
-	);
-
-	rotX = cgmath::mat4(
-		cgmath::vec4(1., 0., 0., 0.),
-		cgmath::vec4(0., cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0.),
-		cgmath::vec4(0., -sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0.),
-		cgmath::vec4(0., 0., 0., 1.)
-	);
+	rotZ = rotateZ(iTime);
+	rotY = rotateY(iTime);
+	rotX = rotateX(iTime);
 
 	Model = rotX * rotY * rotZ * scale * trans;
 	mxpMatrix = Projection * View * Model;
@@ -279,9 +232,19 @@ void scene_cube::mainLoop()
 	glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
 
 	glBindVertexArray(vao);
+	glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
+	glBindTexture(GL_TEXTURE_2D, textureId); // Activan la textura en ese bucket
+	//cerdo
+
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
 	glUseProgram(0);
+
+	// Dibuja su geometría
+	glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
+	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura
+	//cerdo
+
 }
 
 void scene_cube::resize(int width, int height)
@@ -291,6 +254,7 @@ void scene_cube::resize(int width, int height)
 	//Inicio, Fin (coordenadas)
 	glViewport(0, 0, width, height);
 	glUseProgram(shader_program);
+
 	GLuint resolution_location = glGetUniformLocation(shader_program, "iResolution");
 	glUniform2f(resolution_location, width, height);
 
@@ -303,4 +267,134 @@ void scene_cube::resize(int width, int height)
 
 float scene_cube::radians(float grados) {
 	return (grados * M_PI) / 180.;
+}
+
+cgmath::mat4 scene_cube::rotateX(float iTime)
+{
+	return cgmath::mat4(
+		cgmath::vec4(1., 0., 0., 0.),
+		cgmath::vec4(0., cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0.),
+		cgmath::vec4(0., -sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0.),
+		cgmath::vec4(0., 0., 0., 1.)
+	);
+}
+
+cgmath::mat4 scene_cube::rotateY(float iTime)
+{
+	return cgmath::mat4(
+		cgmath::vec4(cos(radians(60.)*iTime), 0., -sin(radians(60.)*iTime), 0.),
+		cgmath::vec4(0., 1., 0., 0.),
+		cgmath::vec4(sin(radians(60.)*iTime), 0., cos(radians(60.)*iTime), 0.),
+		cgmath::vec4(0., 0., 0., 1.)
+	);
+}
+
+cgmath::mat4 scene_cube::rotateZ(float iTime)
+{
+	return  cgmath::mat4(
+		cgmath::vec4(cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0., 0.),
+		cgmath::vec4(-sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0., 0.),
+		cgmath::vec4(0., 0., 1., 0.),
+		cgmath::vec4(0., 0., 0., 1.)
+	);
+}
+
+cgmath::mat4 scene_cube::scaleM()
+{
+	return cgmath::mat4(
+		cgmath::vec4(1., 0., 0., 0.),
+		cgmath::vec4(0., 1., 0., 0.),
+		cgmath::vec4(0., 0., 1., 0.),
+		cgmath::vec4(0., 0., 0., 1.)
+	);
+}
+
+cgmath::mat4 scene_cube::translation()
+{
+	return cgmath::mat4(
+		cgmath::vec4(1., 0., 0., 0.),
+		cgmath::vec4(0., 1., 0., 0.),
+		cgmath::vec4(0., 0., 1., 0.),
+		cgmath::vec4(0., 0., 0., 1.)
+	);
+}
+
+cgmath::mat4 scene_cube::camera()
+{
+	return cgmath::mat4(
+		cgmath::vec4(1., 0., 0., 0.),
+		cgmath::vec4(0., 1., 0., 0.),
+		cgmath::vec4(0., 0., 1., 0.),
+		cgmath::vec4(0., 0., 10., 1.)
+	);
+
+}
+
+cgmath::mat4 scene_cube::projection()
+{
+	float near = 1.0f;
+	float far = 1000.f;
+	float fov = radians(60.);
+
+	return cgmath::mat4(
+		cgmath::vec4(1. / (aspect*tan(fov / 2.)), 0., 0., 0.),
+		cgmath::vec4(0., 1. / (tan(fov / 2.)), 0., 0.),
+		cgmath::vec4(0., 0., -((far + near) / (far - near)), -1.),
+		cgmath::vec4(0., 0., -((2 * far*near) / (far - near)), 1.)
+	);
+}
+
+void scene_cube::createCube()
+{
+	//Front
+	positions.push_back(cgmath::vec3(-x, y, z)); //v1 - 0
+	positions.push_back(cgmath::vec3(-x, -y, z)); //v2 - 1 
+	positions.push_back(cgmath::vec3(x, -y, z)); //v3 - 2
+	positions.push_back(cgmath::vec3(x, y, z)); //v4 - 3
+
+	//Rigth
+	positions.push_back(cgmath::vec3(x, y, z)); //v4 - 4
+	positions.push_back(cgmath::vec3(x, -y, z)); //v3 - 5
+	positions.push_back(cgmath::vec3(x, -y, -z)); //v7 - 6
+	positions.push_back(cgmath::vec3(x, y, -z)); //v6 - 7
+
+	//Back
+	positions.push_back(cgmath::vec3(-x, y, -z)); //v5 - 8
+	positions.push_back(cgmath::vec3(-x, -y, -z)); //v8 - 9
+	positions.push_back(cgmath::vec3(x, -y, -z)); //v7 - 10
+	positions.push_back(cgmath::vec3(x, y, -z)); //v6 - 11
+
+	//Left
+	positions.push_back(cgmath::vec3(-x, y, z)); //v1 - 12
+	positions.push_back(cgmath::vec3(-x, -y, z)); //v2 - 13
+	positions.push_back(cgmath::vec3(-x, -y, -z)); //v8 - 14
+	positions.push_back(cgmath::vec3(-x, y, -z)); //v5 - 15
+
+	//Top
+	positions.push_back(cgmath::vec3(-x, y, -z)); //v5 - 16
+	positions.push_back(cgmath::vec3(-x, y, z)); //v1 - 17
+	positions.push_back(cgmath::vec3(x, y, z)); //v4 - 18
+	positions.push_back(cgmath::vec3(x, y, -z)); //v6 - 19
+
+	//Bottom
+	positions.push_back(cgmath::vec3(-x, -y, z)); //v2 - 20
+	positions.push_back(cgmath::vec3(x, -y, z)); //v3 - 21
+	positions.push_back(cgmath::vec3(x, -y, -z)); //v7 - 22
+	positions.push_back(cgmath::vec3(-x, -y, -z)); //v8 - 23
+}
+
+void scene_cube::setColors()
+{
+	for (int i = 0; i < minimoNumeroVertices; i++)
+		colors.push_back(cgmath::vec3(1., 1., 1.)); //front
+	for (int i = 0; i < minimoNumeroVertices; i++)
+		colors.push_back(cgmath::vec3(1., 0.0, 0.0)); //right
+	for (int i = 0; i < minimoNumeroVertices; i++)
+		colors.push_back(cgmath::vec3(0.0, 1., 0.)); //back
+	for (int i = 0; i < minimoNumeroVertices; i++)
+		colors.push_back(cgmath::vec3(0.0, 0.0, 1.)); //left
+	for (int i = 0; i < minimoNumeroVertices; i++)
+		colors.push_back(cgmath::vec3(0.2, 0.2, 0.2)); //top
+	for (int i = 0; i < minimoNumeroVertices; i++)
+		colors.push_back(cgmath::vec3(0., 0., 0.)); //bottom
 }

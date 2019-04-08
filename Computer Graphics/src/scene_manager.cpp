@@ -54,7 +54,7 @@ void scene_manager::start(int argc, char* argv[], const std::string& name, int w
 	glCullFace(GL_BACK);
 
 	// Inicializar DevIL. Esto se debe hacer sólo una vez en todo el ciclo de vida del programa.
-	/*ilInit();
+	ilInit();
 	// Cambiar el punto de origen de las texturas. Por default, DevIL
 	// pone un punto de origen en la esquina superior izquierda.
 	// Eso es compatible con el sistema operativo, pero no con el
@@ -62,7 +62,7 @@ void scene_manager::start(int argc, char* argv[], const std::string& name, int w
 	ilEnable(IL_ORIGIN_SET);
 	// Configurar el punto de origen de las texturas en la esquina inferior izquierda
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-	// GL version*/
+	// GL version
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	// Scene init
@@ -102,7 +102,7 @@ void scene_manager::initialize()
 	//std::unique_ptr<scene> somescene(new scene_project);
 	//sceneList.push_back(std::move(somescene));
 	
-	/* std::unique_ptr<scene> scene1(new scene_compatibility);
+	/*std::unique_ptr<scene> scene1(new scene_compatibility);
 	sceneList.push_back(std::move(scene1));
 
 	std::unique_ptr<scene> scene2(new scene_primitives);
