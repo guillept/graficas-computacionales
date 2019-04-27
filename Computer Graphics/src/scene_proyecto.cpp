@@ -27,7 +27,7 @@ void scene_proyecto::init()
 {
 	scale = scaleM();
 	Projection = projection();
-	trans = translation(0, 0., 50.f);
+	trans = translation(0, 0., 10.f);
 
 	// createCube();
 	initParticulas();
@@ -35,17 +35,13 @@ void scene_proyecto::init()
 	
 	// setColors();
 
-	cgmath::vec2 tex00 = cgmath::vec2(0.0, 0.0);
-	cgmath::vec2 tex10 = cgmath::vec2(1.0, 0.0);
-	cgmath::vec2 tex11 = cgmath::vec2(1.0, 1.0);
-	cgmath::vec2 tex01 = cgmath::vec2(0.0, 1.0);
-
 	for (int i = 0; i < 6; i++)
 	{
-		textura.push_back(tex01);
-		textura.push_back(tex11);
-		textura.push_back(tex10);
-		textura.push_back(tex00);
+
+		textura.push_back(cgmath::vec2(1.0, 1.0));
+		textura.push_back(cgmath::vec2(1.0, 0.0));
+		textura.push_back(cgmath::vec2(0.0, 0.0));
+		textura.push_back(cgmath::vec2(0.0, 1.0));
 	}
 
 	// Creacion y activacion del vao
@@ -85,7 +81,7 @@ void scene_proyecto::init()
 
 	ilGenImages(1, &imageID);
 	ilBindImage(imageID);
-	ilLoadImage("images/crate.png");
+	ilLoadImage("images/pig.png");
 
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
@@ -192,7 +188,7 @@ void scene_proyecto::init()
 
 void scene_proyecto::awake()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(1.0f, 0.913f, 0.301f, 1.0f);
 	glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
@@ -211,20 +207,23 @@ void scene_proyecto::mainLoop()
 	rotX = rotateX(moverCamara.x);
 	matrizDeCamara = rotX * rotY * rotZ * scale * trans;
 
-	Model = identidad(); //identidad x,y,z -> posicion matricula
+	Model = 1.0 * rotateX(0) * rotateY(0) * rotateZ(0) * scale * translation(0, 0, 0); //identidad x,y,z -> posicion matricula
 
 
 	glUseProgram(shader_program);
 
-	// mxpMatrix = Projection * View * Model;
-	GLuint normal_location = glGetUniformLocation(shader_program, "mProyeccion");
+	mxpMatrix = Projection * View * Model;
+	GLuint mxpMatrix_location = glGetUniformLocation(shader_program, "mxpMatrix");
+	glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
+
+	/*GLuint normal_location = glGetUniformLocation(shader_program, "mProyeccion");
 	glUniformMatrix4fv(normal_location, 1, GL_FALSE, &Projection[0][0]);
 
 	GLuint model_location = glGetUniformLocation(shader_program, "mVista");
 	glUniformMatrix4fv(model_location, 1, GL_FALSE, &View[0][0]);
 
 	GLuint model = glGetUniformLocation(shader_program, "mModelo");
-	glUniformMatrix4fv(model, 1, GL_FALSE, &Model[0][0]);
+	glUniformMatrix4fv(model, 1, GL_FALSE, &Model[0][0]);*/
 
 	glBindVertexArray(vao);
 	glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
@@ -382,16 +381,16 @@ void scene_proyecto::normalKeysDown(unsigned char key)
 {
 	switch (key) {
 	case 'a':
-		moverCamara.x -= 0.1f;
+		moverCamara.z -= 1;
 		break;
 	case 'd':
-		moverCamara.x += 0.1f;
+		moverCamara.z += 1;
 		break;
 	case 'w':
-		moverCamara.z += 0.1f;
+		moverCamara.x += 1;
 		break;
 	case 's':
-		moverCamara.z -= 0.1f;
+		moverCamara.x -= 1;
 		break;
 	}
 }
@@ -400,8 +399,8 @@ cgmath::mat4 scene_proyecto::rotateX(float iTime)
 {
 	return cgmath::mat4(
 		cgmath::vec4(1., 0., 0., 0.),
-		cgmath::vec4(0., cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0.),
-		cgmath::vec4(0., -sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0.),
+		cgmath::vec4(0., cos(radians(iTime)), sin(radians(iTime)), 0.),
+		cgmath::vec4(0., -sin(radians(iTime)), cos(radians(iTime)), 0.),
 		cgmath::vec4(0., 0., 0., 1.)
 	);
 }
@@ -409,9 +408,9 @@ cgmath::mat4 scene_proyecto::rotateX(float iTime)
 cgmath::mat4 scene_proyecto::rotateY(float iTime)
 {
 	return cgmath::mat4(
-		cgmath::vec4(cos(radians(60.)*iTime), 0., -sin(radians(60.)*iTime), 0.),
+		cgmath::vec4(cos(radians(iTime)), 0., -sin(radians(iTime)), 0.),
 		cgmath::vec4(0., 1., 0., 0.),
-		cgmath::vec4(sin(radians(60.)*iTime), 0., cos(radians(60.)*iTime), 0.),
+		cgmath::vec4(sin(radians(iTime)), 0., cos(radians(iTime)), 0.),
 		cgmath::vec4(0., 0., 0., 1.)
 	);
 }
@@ -419,8 +418,8 @@ cgmath::mat4 scene_proyecto::rotateY(float iTime)
 cgmath::mat4 scene_proyecto::rotateZ(float iTime)
 {
 	return  cgmath::mat4(
-		cgmath::vec4(cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0., 0.),
-		cgmath::vec4(-sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0., 0.),
+		cgmath::vec4(cos(radians(iTime)), sin(radians(iTime)), 0., 0.),
+		cgmath::vec4(-sin(radians(iTime)), cos(radians(iTime)), 0., 0.),
 		cgmath::vec4(0., 0., 1., 0.),
 		cgmath::vec4(0., 0., 0., 1.)
 	);

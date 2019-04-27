@@ -28,7 +28,7 @@ void scene_cube::init()
 	trans = translation();
 	cgmath::mat4 matrizDeCamara = camera();
 
-	Model = rotX * rotY * rotZ * scale * trans;
+	Model = /*rotX * rotY * rotZ * */scale * trans;
 	View = cgmath::mat4::inverse(matrizDeCamara);
 	Projection = projection();
 
@@ -54,10 +54,10 @@ void scene_cube::init()
 
 	for (int i = 0; i < 6; i++)
 	{
-		textura.push_back(tex01);
 		textura.push_back(tex11);
 		textura.push_back(tex10);
 		textura.push_back(tex00);
+		textura.push_back(tex01);
 	}
 
 	// Creacion y activacion del vao
@@ -222,7 +222,7 @@ void scene_cube::mainLoop()
 	rotY = rotateY(iTime);
 	rotX = rotateX(iTime);
 
-	Model = rotX * rotY * rotZ * scale * trans;
+	Model = /*rotX * rotY * rotZ * */scale * trans;
 	mxpMatrix = Projection * View * Model;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
