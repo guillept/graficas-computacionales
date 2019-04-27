@@ -59,6 +59,7 @@
     <ClCompile Include="src\scene_sphere.cpp" />
     <ClCompile Include="src\scene_vertex.cpp" />
     <ClCompile Include="src\schene_chaikin.cpp" />
+    <ClCompile Include="src\scene_proyecto.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Math\Math.vcxproj">
@@ -78,6 +79,7 @@
     <ClInclude Include="include\scene_fragment.h" />
     <ClInclude Include="include\scene_manager.h" />
     <ClInclude Include="include\scene_primitives.h" />
+    <ClInclude Include="include\scene_proyecto.h" />
     <ClInclude Include="include\scene_sphere.h" />
     <ClInclude Include="include\scene_vertex.h" />
     <ClInclude Include="include\schene_chaikin.h" />
@@ -88,9 +90,13 @@
     <None Include="shaders\cube.frag" />
     <None Include="shaders\cube.vert" />
     <None Include="shaders\grid.vert" />
+    <None Include="shaders\particulas.vert" />
     <None Include="shaders\simple_pass.vert" />
     <None Include="shaders\solid_color.frag" />
     <None Include="shaders\sphere.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\Downloads\drop.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

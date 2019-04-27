@@ -16,6 +16,7 @@
 #include "scene_sphere.h"
 #include "scene_circle.h"
 #include "scene_cube.h"
+#include "scene_proyecto.h"
 
 #include "time.h"
 
@@ -118,7 +119,7 @@ void scene_manager::initialize()
 	sceneList.push_back(std::move(scene_vertex));
 
 	std::unique_ptr<scene> scene_fragment(new scene_fragment);
-	sceneList.push_back(std::move(scene_fragment));*/
+	sceneList.push_back(std::move(scene_fragment));
 
 	std::unique_ptr<scene> scene_circle_grid(new scene_circle_grid);
 	sceneList.push_back(std::move(scene_circle_grid));
@@ -130,7 +131,10 @@ void scene_manager::initialize()
 	sceneList.push_back(std::move(scene_circle));
 	
 	std::unique_ptr<scene> scene_cube(new scene_cube);
-	sceneList.push_back(std::move(scene_cube));
+	sceneList.push_back(std::move(scene_cube));*/
+
+	std::unique_ptr<scene> scene_proyecto(new scene_proyecto);
+	sceneList.push_back(std::move(scene_proyecto));
 	
 	
 	for (auto& s : sceneList)

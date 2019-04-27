@@ -51,6 +51,9 @@
     <ClCompile Include="src\scene_cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scene_proyecto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\scene_manager.h">
@@ -89,6 +92,9 @@
     <ClInclude Include="include\scene_cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\scene_proyecto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\grid.vert" />
@@ -99,5 +105,11 @@
     <None Include="shaders\circle.frag" />
     <None Include="shaders\cube.vert" />
     <None Include="shaders\cube.frag" />
+    <None Include="shaders\particulas.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\Downloads\drop.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
