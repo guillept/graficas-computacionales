@@ -38,11 +38,13 @@ public:
 	cgmath::mat4 projection();
 	void createCube();
 	void setColors();
+	void createTexturas();
+	void createNormales();
 
 private:
 	GLuint shader_program;
 	GLuint vao;
-	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO;
+	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO, normalsVBO;
 
 	GLfloat x = 3.f, y = 3.f, z = 3.f, aspect = 1.0f;
 
@@ -55,6 +57,7 @@ private:
 	std::vector<cgmath::vec3> positions;
 	std::vector<cgmath::vec3> colors;
 	std::vector<cgmath::vec2> textura;
+	std::vector<cgmath::vec3> normals;
 
 	ILuint imageID;
 	GLuint textureId;

@@ -19,16 +19,9 @@ void scene_cube::init()
 {
 
 	//Matriz de modelo translation*rotation*scale
-	float iTime = time::elapsed_time().count();
-
-	rotZ = rotateZ(iTime);
-	rotY = rotateY(iTime);
-	rotX = rotateX(iTime);
 	scale = scaleM();
 	trans = translation();
 	cgmath::mat4 matrizDeCamara = camera();
-
-	Model = /*rotX * rotY * rotZ * */scale * trans;
 	View = cgmath::mat4::inverse(matrizDeCamara);
 	Projection = projection();
 
@@ -46,19 +39,9 @@ void scene_cube::init()
 	};
 
 	setColors();
+	createTexturas();
 
-	cgmath::vec2 tex00 = cgmath::vec2(0.0, 0.0);
-	cgmath::vec2 tex10 = cgmath::vec2(1.0, 0.0);
-	cgmath::vec2 tex11 = cgmath::vec2(1.0, 1.0);
-	cgmath::vec2 tex01 = cgmath::vec2(0.0, 1.0);
-
-	for (int i = 0; i < 6; i++)
-	{
-		textura.push_back(tex11);
-		textura.push_back(tex10);
-		textura.push_back(tex00);
-		textura.push_back(tex01);
-	}
+	createNormales();
 
 	// Creacion y activacion del vao
 	glGenVertexArrays(1, &vao);
@@ -93,6 +76,14 @@ void scene_cube::init()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	glGenBuffers(1, &normalsVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec3) * normals.size(), normals.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
 	glBindVertexArray(0); //unbind vao
 
 	ilGenImages(1, &imageID);
@@ -115,22 +106,6 @@ void scene_cube::init()
 
 	//repetir cerdo
 
-	/*cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
-
-	ambiental = 10 % * LightColor;
-
-	cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
-
-	difusse = normalize(Light) * normalize(PixelNormal);
-	LightPosition = vec3();
-	PixelPosition = VertexPosition * Model;
-
-
-	R = reflect(-LightColor, PixelNormal);
-	CamaraPosition = cos(R, V) *  LightColor;
-	specular =
-		cgmath::vec3 phong = ambient + diffuse + specular * TextureColor;
-		*/
 	ifile shader_file;
 	shader_file.read("shaders/cube.vert");
 	std::string vertex_source = shader_file.get_contents();
@@ -186,6 +161,7 @@ void scene_cube::init()
 	glBindAttribLocation(shader_program, 0, "VertexPosition");
 	glBindAttribLocation(shader_program, 1, "InterpolatedColor");
 	glBindAttribLocation(shader_program, 2, "TexturePosition");
+	glBindAttribLocation(shader_program, 3, "VertexNormal");
 	glLinkProgram(shader_program);
 
 	// Borramos los shaders, porque ya tenemos el ejecutable
@@ -193,6 +169,19 @@ void scene_cube::init()
 	glDeleteShader(fragment_shader);
 
 	glUseProgram(shader_program);
+
+	// cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightcolor_location = glGetUniformLocation(shader_program, "LightColor");
+	glUniform3f(lightcolor_location, 1.0f, 1.0f, 1.0f);
+
+	//cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightpos_location = glGetUniformLocation(shader_program, "LightPosition");
+	glUniform3f(lightpos_location, 10.0f, 10.0f, 10.0f);
+
+
+	GLuint campos_location = glGetUniformLocation(shader_program, "CameraPosition");
+	glUniform3f(campos_location, 0.0f, 0.0f, 10.0f);
+	
 	GLuint texture1_location = glGetUniformLocation(shader_program, "text1");
 	glUniform1i(texture1_location, 0);
 	GLuint texture2_location = glGetUniformLocation(shader_program, "text2");
@@ -222,7 +211,7 @@ void scene_cube::mainLoop()
 	rotY = rotateY(iTime);
 	rotX = rotateX(iTime);
 
-	Model = /*rotX * rotY * rotZ * */scale * trans;
+	Model = rotX * rotY * rotZ * scale * trans;
 	mxpMatrix = Projection * View * Model;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -231,36 +220,29 @@ void scene_cube::mainLoop()
 	GLuint mxpMatrix_location = glGetUniformLocation(shader_program, "mxpMatrix");
 	glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
 
-	glBindVertexArray(vao);
+	GLuint model_location = glGetUniformLocation(shader_program, "modelMatrix");
+	glUniformMatrix4fv(model_location, 1, GL_FALSE, &Model[0][0]);
+
 	glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
 	glBindTexture(GL_TEXTURE_2D, textureId); // Activan la textura en ese bucket
 	//cerdo
 
+	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
-	glUseProgram(0);
 
 	// Dibuja su geometría
 	glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
 	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura
 	//cerdo
 
+	glUseProgram(0);
 }
 
 void scene_cube::resize(int width, int height)
 {
-	mxpMatrix = Projection * View * Model;
-
 	//Inicio, Fin (coordenadas)
 	glViewport(0, 0, width, height);
-	glUseProgram(shader_program);
-
-	GLuint resolution_location = glGetUniformLocation(shader_program, "iResolution");
-	glUniform2f(resolution_location, width, height);
-
-	GLuint mxpMatrix_location = glGetUniformLocation(shader_program, "mxpMatrix");
-	glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
-	glUseProgram(0);
 
 	aspect = width / height;
 }
@@ -397,4 +379,49 @@ void scene_cube::setColors()
 		colors.push_back(cgmath::vec3(0.2, 0.2, 0.2)); //top
 	for (int i = 0; i < minimoNumeroVertices; i++)
 		colors.push_back(cgmath::vec3(0., 0., 0.)); //bottom
+}
+
+void scene_cube::createTexturas() 
+{
+	for (int i = 0; i < 6; i++)
+	{
+		textura.push_back(cgmath::vec2(1.0, 1.0));
+		textura.push_back(cgmath::vec2(1.0, 0.0));
+		textura.push_back(cgmath::vec2(0.0, 0.0));
+		textura.push_back(cgmath::vec2(0.0, 1.0));
+	}
+}
+
+void scene_cube::createNormales()
+{
+	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+
+	normals.push_back(cgmath::vec3(1.0f, 0.0f, 0.0f));
+	normals.push_back(cgmath::vec3(1.0f, 0.0f, 0.0f));
+	normals.push_back(cgmath::vec3(1.0f, 0.0f, 0.0f));
+	normals.push_back(cgmath::vec3(1.0f, 0.0f, 0.0f));
+
+	normals.push_back(cgmath::vec3(0.0f, 0.0f, -1.0f));
+	normals.push_back(cgmath::vec3(0.0f, 0.0f, -1.0f));
+	normals.push_back(cgmath::vec3(0.0f, 0.0f, -1.0f));
+	normals.push_back(cgmath::vec3(0.0f, 0.0f, -1.0f));
+
+	normals.push_back(cgmath::vec3(-1.0f, 0.0f, 0.0f));
+	normals.push_back(cgmath::vec3(-1.0f, 0.0f, 0.0f));
+	normals.push_back(cgmath::vec3(-1.0f, 0.0f, 0.0f));
+	normals.push_back(cgmath::vec3(-1.0f, 0.0f, 0.0f));
+
+	normals.push_back(cgmath::vec3(0.0f, 1.0f, 0.0f));
+	normals.push_back(cgmath::vec3(0.0f, 1.0f, 0.0f));
+	normals.push_back(cgmath::vec3(0.0f, 1.0f, 0.0f));
+	normals.push_back(cgmath::vec3(0.0f, 1.0f, 0.0f));
+
+	normals.push_back(cgmath::vec3(0.0f, -1.0f, 0.0f));
+	normals.push_back(cgmath::vec3(0.0f, -1.0f, 0.0f));
+	normals.push_back(cgmath::vec3(0.0f, -1.0f, 0.0f));
+	normals.push_back(cgmath::vec3(0.0f, -1.0f, 0.0f));
+
 }
