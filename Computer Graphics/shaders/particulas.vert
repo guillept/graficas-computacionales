@@ -23,6 +23,7 @@ void main()
 	vec4 pos = mxpMatrix * vec4(newPosition, 1.0f);
 	pos.x += VertexPosition.x;
 	pos.y += VertexPosition.y;
+	// pos.z += VertexPosition.z;
 	//Billboard - remove float z = VertexPosition.z  + newPosition.z;
 
 	gl_Position = pos;

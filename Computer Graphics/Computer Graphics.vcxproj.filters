@@ -106,6 +106,7 @@
     <None Include="shaders\cube.vert" />
     <None Include="shaders\cube.frag" />
     <None Include="shaders\particulas.vert" />
+    <None Include="shaders\particulas.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\..\Downloads\drop.png">

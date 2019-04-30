@@ -90,6 +90,7 @@
     <None Include="shaders\cube.frag" />
     <None Include="shaders\cube.vert" />
     <None Include="shaders\grid.vert" />
+    <None Include="shaders\particulas.frag" />
     <None Include="shaders\particulas.vert" />
     <None Include="shaders\simple_pass.vert" />
     <None Include="shaders\solid_color.frag" />

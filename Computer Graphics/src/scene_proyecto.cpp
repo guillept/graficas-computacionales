@@ -8,13 +8,11 @@
 #include <IL/il.h>
 
 #define _USE_MATH_DEFINES
-#define drand rand() / RAND_MAX
 #include <math.h>
 
+#include <algorithm>
 
-#define MAX_PARTICULAS 500 //1000
-
-float x, y, z;
+int vueltas = 0;
 
 scene_proyecto::~scene_proyecto()
 {
@@ -25,14 +23,17 @@ scene_proyecto::~scene_proyecto()
 
 void scene_proyecto::init()
 {
+	//Blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	scale = scaleM();
 	Projection = projection();
-	trans = translation(0, 0., 10.f);
+	trans = translation(0, 0., 40.f);
 
-	// createCube();
 	initParticulas();
 	std::vector<unsigned int> indices = { 0, 1, 2, 2, 3, 0 }; //Front;
-	
+
 	// setColors();
 
 	for (int i = 0; i < 6; i++)
@@ -51,7 +52,7 @@ void scene_proyecto::init()
 	// Creacion y configuracion del buffer del atributo de posicion
 	glGenBuffers(1, &positionsVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec3) * particulas.size(), particulas.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec3) * posicionesParticulaOrigen.size(), posicionesParticulaOrigen.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind
@@ -66,7 +67,7 @@ void scene_proyecto::init()
 	glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec3) * colors.size(), colors.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(1, 3, GL_GLfloat, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 
 	// Creacion y configuracion del buffer del atributo de textura
@@ -81,7 +82,7 @@ void scene_proyecto::init()
 
 	ilGenImages(1, &imageID);
 	ilBindImage(imageID);
-	ilLoadImage("images/pig.png");
+	ilLoadImage("images/drop.png");
 
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
@@ -99,22 +100,6 @@ void scene_proyecto::init()
 
 	//repetir cerdo
 
-	/*cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
-
-	ambiental = 10 % * LightColor;
-
-	cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
-
-	difusse = normalize(Light) * normalize(PixelNormal);
-	LightPosition = vec3();
-	PixelPosition = VertexPosition * Model;
-
-
-	R = reflect(-LightColor, PixelNormal);
-	CamaraPosition = cos(R, V) *  LightColor;
-	specular =
-		cgmath::vec3 phong = ambient + diffuse + specular * TextureColor;
-		*/
 	ifile shader_file;
 	shader_file.read("shaders/particulas.vert");
 	std::string vertex_source = shader_file.get_contents();
@@ -139,7 +124,7 @@ void scene_proyecto::init()
 		std::cout << std::endl;
 	}
 
-	shader_file.read("shaders/cube.frag");
+	shader_file.read("shaders/particulas.frag");
 	std::string fragment_source = shader_file.get_contents();
 	const GLchar* fragment_source_c = (const GLchar*)fragment_source.c_str();
 	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -201,18 +186,36 @@ void scene_proyecto::sleep()
 void scene_proyecto::mainLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	rotZ = rotateZ(moverCamara.z);
 	rotY = rotateY(0);
 	rotX = rotateX(moverCamara.x);
 	matrizDeCamara = rotX * rotY * rotZ * scale * trans;
 
-	Model = 1.0 * rotateX(0) * rotateY(0) * rotateZ(0) * scale * translation(0, 0, 0); //identidad x,y,z -> posicion matricula
+	View = cgmath::mat4::inverse(matrizDeCamara);
+	Model = rotateX(0) * rotateY(0) * rotateZ(0) * scale * translation(0, 0, 0); //identidad x,y,z -> posicion matricula
+	
+	ViewModel = View * Model;
+	// Billboard
+	// Column 0:
+	/*ViewModel[0][0] = 1;
+	ViewModel[1][0] = 0;
+	ViewModel[2][0] = 0;
 
+	// Column 1:
+	ViewModel[0][1] = 0;
+	ViewModel[1][1] = 1;
+	ViewModel[2][1] = 0;
 
+	// Column 2:
+	ViewModel[0][2] = 0;
+	ViewModel[1][2] = 0;
+	ViewModel[2][2] = 1;*/
+	
 	glUseProgram(shader_program);
 
-	mxpMatrix = Projection * View * Model;
+	// mxpMatrix = Projection * View * Model;
+	mxpMatrix = Projection * ViewModel;
 	GLuint mxpMatrix_location = glGetUniformLocation(shader_program, "mxpMatrix");
 	glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
 
@@ -230,21 +233,41 @@ void scene_proyecto::mainLoop()
 	glBindTexture(GL_TEXTURE_2D, textureId); // Activan la textura en ese bucket
 	//cerdo
 
-	// mxpMatrix = Projection * View * Model;
-	View = cgmath::mat4::inverse(matrizDeCamara);
+	std::sort(&particulas[0], &particulas[MAX_PARTICULAS - 1]);
+	vueltas += 1;
+	/*if (vueltas % 1000 == 0) {
+		for (int i = 0; i < MAX_PARTICULAS; i++)
+		std::cout << particulas[i].distance.magnitude() << ' ' << i << std::endl;
+	}*/
+	GLfloat willPartiTheParticleLive = 0;
 
-	// std::sort(positions.begin(), positions.end(), funCamara);
 	for (int i = 0; i < MAX_PARTICULAS; i++)
 	{
-		y = positions[i].y - veclocidad[i].y;
-		if (y > -bound) {
-			veclocidad[i].y += aceleracion;
-		} else {
-			resetParticula(i);
+		int index = particulas[i].position;
+		/*if (vueltas % 1000 == 0) {
+			std::cout << particulas[i].distance.magnitude() << ' ' << index << std::endl;
+		}*/
+		if (index == 0 && positions[index].y >= bound && positions[index].y < bound+0.5) {
+			end = time::elapsed_time().count();
+			// std::cout << life[i] << std::endl;
 		}
-		
+		life[index] -= 1.0;
+		//is particle alive?
+		if (life[index] > 0) {
+			particulas[i].distance = calculateDistance(index);
+			positions[index].y -= veclocidad[index].y;
+			veclocidad[index].y += aceleracion;
+		}
+		//particle is dead
+		else {
+			willPartiTheParticleLive = random(1, 1000);
+			if (willPartiTheParticleLive >= 999) {
+				resetParticula(index);
+			}
+		}
+
 		GLuint pos_location = glGetUniformLocation(shader_program, "newPosition");
-		glUniform3f(pos_location, positions[i].x, y, positions[i].z);
+		glUniform3f(pos_location, positions[index].x, positions[index].y, positions[index].z);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 	}
 
@@ -272,7 +295,7 @@ void scene_proyecto::resize(int width, int height)
 	aspect = width / height;
 }
 
-float scene_proyecto::radians(float grados) {
+GLfloat scene_proyecto::radians(GLfloat grados) {
 	return (grados * M_PI) / 180.;
 }
 
@@ -286,7 +309,7 @@ cgmath::mat4 scene_proyecto::scaleM()
 	);
 }
 
-cgmath::mat4 scene_proyecto::translation(float x, float y, float z)
+cgmath::mat4 scene_proyecto::translation(GLfloat x, GLfloat y, GLfloat z)
 {
 	return cgmath::mat4(
 		cgmath::vec4(1., 0., 0., 0.),
@@ -341,39 +364,41 @@ void scene_proyecto::setColors()
 void scene_proyecto::initParticulas()
 {
 	//Front
-	particulas.push_back(cgmath::vec3(-1., 1., 0.)); //v1 - 0
-	particulas.push_back(cgmath::vec3(-1., -1., 0.)); //v2 - 1 
-	particulas.push_back(cgmath::vec3(1., -1., 0.)); //v3 - 2
-	particulas.push_back(cgmath::vec3(1., 1., 0.)); //v4 - 3
+	posicionesParticulaOrigen.push_back(cgmath::vec3(-1., 1., 0.)); //v1 - 0
+	posicionesParticulaOrigen.push_back(cgmath::vec3(-1., -1., 0.)); //v2 - 1 
+	posicionesParticulaOrigen.push_back(cgmath::vec3(1., -1., 0.)); //v3 - 2
+	posicionesParticulaOrigen.push_back(cgmath::vec3(1., 1., 0.)); //v4 - 3
 
 	for (int i = 0; i < MAX_PARTICULAS; i++)
 	{
 		/*	-30	30
 			-30	30
 		*/
-		x = random(-bound, bound);
-		y = random(bound, bound * 3);
-		z = random(-bound/2, bound/2);
+		life.push_back(0.0); //al particles are dead at the beginning
+		particulas[i].position = i;
+		particulas[i].distance = cgmath::vec3(0, 0, 0);
+
+		setXYZ();
 		positions.push_back(cgmath::vec4(x, y, z, 1.0f));
 		veclocidad.push_back(cgmath::vec3(0, 0, 0));
 	}
 
 	moverCamara = cgmath::vec3(0, 0, 0);
+	start = time::elapsed_time().count();
 
 }
 
 void scene_proyecto::resetParticula(int i)
 {
 	GLfloat v;
-	x = random(-bound, bound);
-	y = random(bound, bound * 2);
-	z = random(-bound/2, bound/2);
+	setXYZ();
 
 	positions[i] = cgmath::vec4(x, y, z, 1.0f);
 	veclocidad[i] = cgmath::vec3(0, 0, 0);
+	life[i] = lifeTime;
 }
 
-float scene_proyecto::random(float fMin, float fMax) {
+GLfloat scene_proyecto::random(GLfloat fMin, GLfloat fMax) {
 	return fMin + (rand() / (RAND_MAX / (fMax - fMin)));
 }
 
@@ -381,21 +406,21 @@ void scene_proyecto::normalKeysDown(unsigned char key)
 {
 	switch (key) {
 	case 'a':
-		moverCamara.z -= 1;
+		moverCamara.x -= 1;
 		break;
 	case 'd':
-		moverCamara.z += 1;
-		break;
-	case 'w':
 		moverCamara.x += 1;
 		break;
+	case 'w':
+		moverCamara.z += 1;
+		break;
 	case 's':
-		moverCamara.x -= 1;
+		moverCamara.z += 1;
 		break;
 	}
 }
 
-cgmath::mat4 scene_proyecto::rotateX(float iTime)
+cgmath::mat4 scene_proyecto::rotateX(GLfloat iTime)
 {
 	return cgmath::mat4(
 		cgmath::vec4(1., 0., 0., 0.),
@@ -405,7 +430,7 @@ cgmath::mat4 scene_proyecto::rotateX(float iTime)
 	);
 }
 
-cgmath::mat4 scene_proyecto::rotateY(float iTime)
+cgmath::mat4 scene_proyecto::rotateY(GLfloat iTime)
 {
 	return cgmath::mat4(
 		cgmath::vec4(cos(radians(iTime)), 0., -sin(radians(iTime)), 0.),
@@ -415,7 +440,7 @@ cgmath::mat4 scene_proyecto::rotateY(float iTime)
 	);
 }
 
-cgmath::mat4 scene_proyecto::rotateZ(float iTime)
+cgmath::mat4 scene_proyecto::rotateZ(GLfloat iTime)
 {
 	return  cgmath::mat4(
 		cgmath::vec4(cos(radians(iTime)), sin(radians(iTime)), 0., 0.),
@@ -424,18 +449,18 @@ cgmath::mat4 scene_proyecto::rotateZ(float iTime)
 		cgmath::vec4(0., 0., 0., 1.)
 	);
 }
-/*
-bool funCamara(particula i, particula j)
+
+cgmath::vec3 scene_proyecto::calculateDistance(int i)
 {
-	cgmath::vec3 d1 = i.camara - i.position;
-	cgmath::vec3 d2 = j.camara - i.position;
-	if (d1.magnitude() < d2.magnitude())
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	// Column 3
+	cgmath::vec3 camara = cgmath::vec3(matrizDeCamara[3][0], matrizDeCamara[3][1], matrizDeCamara[3][2]);
+	cgmath::vec3 position_particula = cgmath::vec3(positions[i].x, positions[i].y, positions[i].z);
+	return camara - position_particula;
 }
-*/
+
+void scene_proyecto::setXYZ()
+{
+	x = random(-bound, bound);
+	y = bound;
+	z = random(-30, 30);
+}

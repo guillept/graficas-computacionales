@@ -129,13 +129,13 @@ void scene_manager::initialize()
 
 	std::unique_ptr<scene> scene_circle(new scene_circle);
 	sceneList.push_back(std::move(scene_circle));
-	
+
 	std::unique_ptr<scene> scene_cube(new scene_cube);
-	sceneList.push_back(std::move(scene_cube));*/
+	sceneList.push_back(std::move(scene_cube)); */
 
 	std::unique_ptr<scene> scene_proyecto(new scene_proyecto);
 	sceneList.push_back(std::move(scene_proyecto));
-	
+		
 	
 	for (auto& s : sceneList)
 		s->init();

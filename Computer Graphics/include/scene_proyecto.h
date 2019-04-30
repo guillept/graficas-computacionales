@@ -11,6 +11,8 @@
 
 #include <IL/il.h>
 
+#define MAX_PARTICULAS 1000
+
 // Escena de prueba para comenzar a trabajar con
 // fragment shaders.
 class scene_proyecto : public scene
@@ -28,57 +30,60 @@ public:
 	void normalKeysUp(unsigned char key) { }
 	void specialKeys(int key) { }
 	void passiveMotion(int x, int y) { }
-	float radians(float grados);
-	cgmath::mat4 rotateX(float iTime);
-	cgmath::mat4 rotateY(float iTime);
-	cgmath::mat4 rotateZ(float iTime);
+	GLfloat radians(GLfloat grados);
+	cgmath::mat4 rotateX(GLfloat iTime);
+	cgmath::mat4 rotateY(GLfloat iTime);
+	cgmath::mat4 rotateZ(GLfloat iTime);
 	cgmath::mat4 scaleM();
-	cgmath::mat4 translation(float x, float y, float z);
+	cgmath::mat4 translation(GLfloat x, GLfloat y, GLfloat z);
 	cgmath::mat4 identidad();
 	cgmath::mat4 projection();
+	void setXYZ();
 	void setColors();
 	void initParticulas();
 	void resetParticula(int i);
-	float random(float fMax, float fMin);
-	void moverGota(int i);
-	void draw();
+	GLfloat random(GLfloat fMax, GLfloat fMin);
+	cgmath::vec3 calculateDistance(int i);
 
 private:
 	GLuint shader_program;
 	GLuint vao;
 	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO;
 
-	GLfloat x = 3.f, y = 3.f, z = 3.f, aspect = 1.0f;
+	GLfloat x, y, z, aspect = 1.0f;
 
 	int minimoNumeroVertices = 4;
 
 	cgmath::mat4 rotX, rotY, rotZ, scale, trans, transCamara;
-	cgmath::mat4 Projection, View, Model, matrizDeCamara;
+	cgmath::mat4 Projection, View, Model, matrizDeCamara, ViewModel;
 	cgmath::mat4 mxpMatrix;
 	cgmath::vec3 moverCamara;
 
-	std::vector<cgmath::vec4> positions;
+	std::vector<cgmath::vec3> posicionesParticulaOrigen; // posicion original de la particula
 	std::vector<cgmath::vec3> colors;
 	std::vector<cgmath::vec2> textura;
 
 	ILuint imageID;
 	GLuint textureId;
 
-
-	/*std::vector<float> life; // vida
-	std::vector<float> fade; // fade
-	float	r, g, b;    // color
-	std::vector<cgmath::vec3> particulas; // posicion
-	std::vector<cgmath::vec3> veclocidad; // velocidad 
-	// std::vector<cgmath::vec3> aceleracion; // aceleracion
-	*/
 	std::vector<float> life; // vida
 	std::vector<float> fade; // fade
-	float	r, g, b;    // color
-	std::vector<cgmath::vec3> particulas; // posicion
+	GLfloat	r, g, b;    // color
+	std::vector<cgmath::vec4> positions;
 	std::vector<cgmath::vec3> veclocidad; // velocidad
-	// std::vector<cgmath::vec3> aceleracion; // aceleracion
-	float aceleracion = .00981f;
-	float bound = 35.f;
-	float lifeLowerBound = 500, lifeUpperBound = 1000, lifeTime;
+	// std::vector<int> particulas; //indexes to relate the arrays
+
+	struct particula {
+		int position;
+		cgmath::vec3 distance;
+		bool operator<(particula& that) {
+			return this->distance.magnitude() > that.distance.magnitude();
+		};
+	} particulas[MAX_PARTICULAS];
+
+	//std::vector<particula> particulas;
+	GLfloat aceleracion = .000981f; //.000981f;
+	GLfloat bound = 50.f;
+	GLfloat lifeTime = 2000;
+	GLfloat start, end;
 };
