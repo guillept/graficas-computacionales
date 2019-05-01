@@ -8,13 +8,10 @@
 #include "mat4.h"
 
 #include <vector>
-
 #include <IL/il.h>
 
 #define MAX_PARTICULAS 1000
 
-// Escena de prueba para comenzar a trabajar con
-// fragment shaders.
 class scene_proyecto : public scene
 {
 public:
@@ -34,56 +31,49 @@ public:
 	cgmath::mat4 rotateX(GLfloat iTime);
 	cgmath::mat4 rotateY(GLfloat iTime);
 	cgmath::mat4 rotateZ(GLfloat iTime);
-	cgmath::mat4 scaleM();
 	cgmath::mat4 translation(GLfloat x, GLfloat y, GLfloat z);
-	cgmath::mat4 identidad();
 	cgmath::mat4 projection();
-	void setXYZ();
-	void setColors();
+
+	//Auxiliary algorithms
 	void initParticulas();
+	void setTexturas();
 	void resetParticula(int i);
 	GLfloat random(GLfloat fMax, GLfloat fMin);
 	cgmath::vec3 calculateDistance(int i);
+	void billboard();
+	void setXYZ();
+	void setColors();
 
 private:
 	GLuint shader_program;
 	GLuint vao;
 	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO;
 
-	GLfloat x, y, z, aspect = 1.0f;
-
-	int minimoNumeroVertices = 4;
-
-	cgmath::mat4 rotX, rotY, rotZ, scale, trans, transCamara;
-	cgmath::mat4 Projection, View, Model, matrizDeCamara, ViewModel;
-	cgmath::mat4 mxpMatrix;
+	cgmath::mat4 trans;
+	cgmath::mat4 Projection, View, Model, matrizDeCamara, ViewModel, mxpMatrix;
 	cgmath::vec3 moverCamara;
-
-	std::vector<cgmath::vec3> posicionesParticulaOrigen; // posicion original de la particula
-	std::vector<cgmath::vec3> colors;
-	std::vector<cgmath::vec2> textura;
 
 	ILuint imageID;
 	GLuint textureId;
 
-	std::vector<float> life; // vida
-	std::vector<float> fade; // fade
-	GLfloat	r, g, b;    // color
+	std::vector<GLfloat> lifes;
 	std::vector<cgmath::vec4> positions;
-	std::vector<cgmath::vec3> veclocidad; // velocidad
-	// std::vector<int> particulas; //indexes to relate the arrays
+	std::vector<cgmath::vec3> veclocidad;
+	std::vector<cgmath::vec3> posicionesParticulaOrigen; // posicion original de la particula
+	std::vector<cgmath::vec3> colors;
+	std::vector<cgmath::vec2> textura;
 
-	struct particula {
+	struct Particula {
 		int position;
 		cgmath::vec3 distance;
-		bool operator<(particula& that) {
+		bool operator<(Particula& that) {
 			return this->distance.magnitude() > that.distance.magnitude();
 		};
 	} particulas[MAX_PARTICULAS];
 
-	//std::vector<particula> particulas;
-	GLfloat aceleracion = .000981f; //.000981f;
-	GLfloat bound = 50.f;
-	GLfloat lifeTime = 2000;
-	GLfloat start, end;
+	GLfloat aceleracion = 9.81f, bound = 40.f, lifeTime = 1000;
+
+	//Auxiliary variables
+	GLfloat x, y, z, willPartiTheParticleLive, aspect = 1.0f;
+	int index;
 };
