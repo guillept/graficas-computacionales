@@ -146,6 +146,19 @@ void scene_proyecto::init()
 	glDeleteShader(fragment_shader);
 
 	glUseProgram(shader_program);
+	
+	// cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightcolor_location = glGetUniformLocation(shader_program, "LightColor");
+	glUniform3f(lightcolor_location, 1.0f, 1.0f, 1.0f);
+
+	//cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightpos_location = glGetUniformLocation(shader_program, "LightPosition");
+	glUniform3f(lightpos_location, 10.0f, 10.0f, 10.0f);
+
+
+	GLuint campos_location = glGetUniformLocation(shader_program, "CameraPosition");
+	glUniform3f(campos_location, 0.0f, 0.0f, 10.0f);
+
 	GLuint texture1_location = glGetUniformLocation(shader_program, "texture");
 	glUniform1i(texture1_location, 0);
 

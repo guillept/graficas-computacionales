@@ -54,6 +54,7 @@
     <ClCompile Include="src\scene_conchoid.cpp" />
     <ClCompile Include="src\scene_cube.cpp" />
     <ClCompile Include="src\scene_fragment.cpp" />
+    <ClCompile Include="src\scene_fuego.cpp" />
     <ClCompile Include="src\scene_manager.cpp" />
     <ClCompile Include="src\scene_primitives.cpp" />
     <ClCompile Include="src\scene_sphere.cpp" />
