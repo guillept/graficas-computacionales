@@ -54,12 +54,14 @@
     <ClCompile Include="src\scene_conchoid.cpp" />
     <ClCompile Include="src\scene_cube.cpp" />
     <ClCompile Include="src\scene_fragment.cpp" />
+    <ClCompile Include="src\scene_fuego.cpp" />
+    <ClCompile Include="src\scene_lluvia.cpp" />
     <ClCompile Include="src\scene_manager.cpp" />
+    <ClCompile Include="src\scene_nieve.cpp" />
     <ClCompile Include="src\scene_primitives.cpp" />
     <ClCompile Include="src\scene_sphere.cpp" />
     <ClCompile Include="src\scene_vertex.cpp" />
     <ClCompile Include="src\schene_chaikin.cpp" />
-    <ClCompile Include="src\scene_proyecto.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Math\Math.vcxproj">
@@ -77,9 +79,11 @@
     <ClInclude Include="include\scene_conchoid.h" />
     <ClInclude Include="include\scene_cube.h" />
     <ClInclude Include="include\scene_fragment.h" />
+    <ClInclude Include="include\scene_fuego.h" />
+    <ClInclude Include="include\scene_lluvia.h" />
     <ClInclude Include="include\scene_manager.h" />
+    <ClInclude Include="include\scene_nieve.h" />
     <ClInclude Include="include\scene_primitives.h" />
-    <ClInclude Include="include\scene_proyecto.h" />
     <ClInclude Include="include\scene_sphere.h" />
     <ClInclude Include="include\scene_vertex.h" />
     <ClInclude Include="include\schene_chaikin.h" />

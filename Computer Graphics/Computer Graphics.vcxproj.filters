@@ -51,7 +51,13 @@
     <ClCompile Include="src\scene_cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scene_proyecto.cpp">
+    <ClCompile Include="src\scene_lluvia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene_fuego.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene_nieve.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,7 +98,13 @@
     <ClInclude Include="include\scene_cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\scene_proyecto.h">
+    <ClInclude Include="include\scene_lluvia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\scene_fuego.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\scene_nieve.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

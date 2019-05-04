@@ -16,7 +16,9 @@
 #include "scene_sphere.h"
 #include "scene_circle.h"
 #include "scene_cube.h"
-#include "scene_proyecto.h"
+#include "scene_lluvia.h"
+#include "scene_nieve.h"
+#include "scene_fuego.h"
 
 #include "time.h"
 
@@ -133,8 +135,14 @@ void scene_manager::initialize()
 	std::unique_ptr<scene> scene_cube(new scene_cube);
 	sceneList.push_back(std::move(scene_cube)); */
 
-	std::unique_ptr<scene> scene_proyecto(new scene_proyecto);
-	sceneList.push_back(std::move(scene_proyecto));
+	/*std::unique_ptr<scene> scene_lluvia(new scene_lluvia);
+	sceneList.push_back(std::move(scene_lluvia)); */
+
+	/*std::unique_ptr<scene> scene_nieve(new scene_nieve);
+	sceneList.push_back(std::move(scene_nieve));*/
+
+	std::unique_ptr<scene> scene_fuego(new scene_fuego);
+	sceneList.push_back(std::move(scene_fuego));
 		
 	
 	for (auto& s : sceneList)

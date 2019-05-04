@@ -12,10 +12,10 @@
 
 #define MAX_PARTICULAS 1000
 
-class scene_proyecto : public scene
+class scene_fuego : public scene
 {
 public:
-	~scene_proyecto();
+	~scene_fuego();
 
 	void init();
 	void awake();
@@ -62,6 +62,7 @@ private:
 	std::vector<cgmath::vec3> posicionesParticulaOrigen; // posicion original de la particula
 	std::vector<cgmath::vec3> colors;
 	std::vector<cgmath::vec2> textura;
+	std::vector<cgmath::vec3> aceleracion;
 
 	struct Particula {
 		int position;
@@ -71,9 +72,10 @@ private:
 		};
 	} particulas[MAX_PARTICULAS];
 
-	GLfloat aceleracion = 9.81f, bound = 80.f, lifeTime = 800;
+	GLfloat maxAceleracion = 7, bound = 10.f, lifeTime = 500;
+	GLfloat gravedad = 9.81;
 
 	//Auxiliary variables
-	GLfloat x, y, z, willPartiTheParticleLive, aspect = 1.0f;
+	GLfloat x, y, z, willPartiTheParticleLive, willPartiThePaticleStayInTheFire, aspect = 1.0f;
 	int index;
-};
+}; 
