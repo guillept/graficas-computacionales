@@ -71,7 +71,7 @@ private:
 		};
 	} particulas[MAX_PARTICULAS];
 
-	GLfloat aceleracion = 9.81f, bound = 80.f, lifeTime = 1000;
+	GLfloat aceleracion = 9.81f, bound = 80.f, lifeTime = 800;
 
 	//Auxiliary variables
 	GLfloat x, y, z, willPartiTheParticleLive, aspect = 1.0f;

@@ -68,76 +68,64 @@ bool cgmath::mat4::operator==(const mat4& m) const
 El método estático inverse(…) calcula la matriz inversa de la matriz 3x3 m y la regresa como un nuevo objeto mat4. El
 método no modifica la mat4 m.
 */
-cgmath::mat4 cgmath::mat4::inverse(const mat4 & m)
+cgmath::mat4 cgmath::mat4::inverse(const cgmath::mat4& m)
 {
-	//Algoritmo tomado de http://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
-	//Repo inspiración https://github.com/peterabraham/Gauss-Jordan-Elimination
+	float Coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+	float Coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
+	float Coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
 
-	int i, j, k;
-	int const n = 4;
-	float pivote;
-	float A[n * 2][n * 2] = {};
+	float Coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+	float Coef06 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+	float Coef07 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
 
-	//Copias matriz orignial
-	for (i = 0; i < n; i++) {
-		for (j = 0; j < n; j++) {
-			A[i][j] = m[i][j];
+	float Coef08 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+	float Coef10 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
+	float Coef11 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
 
-			//Matriz aumentada
-			if (i == j)
-				A[i][j + n] = 1;
-			else
-				A[i][j + n] = 0;
-		}
-	}
+	float Coef12 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+	float Coef14 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
+	float Coef15 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
 
-	//Transofrmacion gaussiana
-	for (k = 0; k < n; k++)
-	{
-		for (i = 0; i < 2 * n; i++)
-		{
-			if (k != i)
-			{
-				pivote = A[i][k] / A[k][k];
-				for (j = 0; j < 2 * n; j++) {
-					A[i][j] -= A[k][j] * pivote;
-				}
-			}
-		}
-	}
+	float Coef16 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+	float Coef18 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
+	float Coef19 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
 
-	for (i = 0; i < n; ++i)
-	{
-		pivote = A[i][i];
-		for (j = 0; j < 2 * n; ++j)
-		{
-			A[i][j] = A[i][j] / pivote;
-		}
-	}
+	float Coef20 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+	float Coef22 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
+	float Coef23 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
 
+	cgmath::vec4 Fac0(Coef00, Coef00, Coef02, Coef03);
+	cgmath::vec4 Fac1(Coef04, Coef04, Coef06, Coef07);
+	cgmath::vec4 Fac2(Coef08, Coef08, Coef10, Coef11);
+	cgmath::vec4 Fac3(Coef12, Coef12, Coef14, Coef15);
+	cgmath::vec4 Fac4(Coef16, Coef16, Coef18, Coef19);
+	cgmath::vec4 Fac5(Coef20, Coef20, Coef22, Coef23);
 
-	/*
-	1               0               0             0.5               0               0
-	0               1               0               0             0.5               0
-	0               0               1               0               0             0.5
-	*/
+	cgmath::vec4 Vec0(m[1][0], m[0][0], m[0][0], m[0][0]);
+	cgmath::vec4 Vec1(m[1][1], m[0][1], m[0][1], m[0][1]);
+	cgmath::vec4 Vec2(m[1][2], m[0][2], m[0][2], m[0][2]);
+	cgmath::vec4 Vec3(m[1][3], m[0][3], m[0][3], m[0][3]);
 
-	cgmath::vec4 a(A[0][4], A[0][5], A[0][6], A[0][7]);
-	cgmath::vec4 b(A[1][4], A[1][5], A[1][6], A[1][7]);
-	cgmath::vec4 c(A[2][4], A[2][5], A[2][6], A[2][7]);
-	cgmath::vec4 d(A[3][4], A[3][5], A[3][6], A[3][7]);
+	cgmath::vec4 Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
+	cgmath::vec4 Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
+	cgmath::vec4 Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
+	cgmath::vec4 Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
 
+	cgmath::vec4 SignA(+1, -1, +1, -1);
+	cgmath::vec4 SignB(-1, +1, -1, +1);
+	mat4 Inverse(Inv0 * SignA, Inv1 * SignB, Inv2 * SignA, Inv3 * SignB);
 
-	return cgmath::mat4(a, b, c, d);
+	cgmath::vec4 Row0(Inverse[0][0], Inverse[1][0], Inverse[2][0], Inverse[3][0]);
 
-	/*
-	std::cout << "-------------------\n\n";
-	for (i=0;i<n;i++)            //print the new matrix
-	{
-		for (j=0;j<n*2;j++)
-			cout<<A[i][j]<<setw(16);
-		cout<<"\n";
-	}
-	std::cout << "-------------------\n\n";
-	*/
+	cgmath::vec4 Dot0(m[0] * Row0);
+	float Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
+
+	float OneOverDeterminant = 1.0f / Dot1;
+
+	Inverse[0] *= OneOverDeterminant;
+	Inverse[1] *= OneOverDeterminant;
+	Inverse[2] *= OneOverDeterminant;
+	Inverse[3] *= OneOverDeterminant;
+
+	return Inverse;
 }

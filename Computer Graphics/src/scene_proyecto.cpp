@@ -169,9 +169,9 @@ void scene_proyecto::mainLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// matrizDeCamara = rotX * rotY * rotZ * scale * trans; 
+	// matrizDeCamara = rotz * rotY * rotx * scale * trans; 
 	// rotY y scale se eliminan = identidad
-	matrizDeCamara = rotateX(moverCamara.x) *  rotateZ(moverCamara.z) * trans;
+	matrizDeCamara = rotateZ(moverCamara.z) * rotateX(moverCamara.x) * trans;
 	View = cgmath::mat4::inverse(matrizDeCamara);
 
 	glUseProgram(shader_program);
