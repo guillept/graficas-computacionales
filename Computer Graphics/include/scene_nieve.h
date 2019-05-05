@@ -66,9 +66,6 @@ private:
 
 	std::vector<float> swingsBounds;
 
-
-	void moverCopoX(int i);
-
 	struct Particula {
 		int position;
 		cgmath::vec3 distance;
@@ -78,9 +75,8 @@ private:
 	} particulas[MAX_PARTICULAS];
 
 	GLfloat aceleracion = 9.81f;
-	GLfloat bound = 40.f, lifeTime = 1000;
-	GLfloat swing = 0.001; //x swing constant
-	char swinging = 'l';
+	GLfloat bound = 80.f, lifeTime = 1200;
+	GLfloat swing;
 
 	//Auxiliary variables
 	GLfloat x, y, z, willPartiTheParticleLive, aspect = 1.0f;

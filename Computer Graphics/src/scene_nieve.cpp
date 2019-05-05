@@ -25,7 +25,7 @@ void scene_nieve::init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Projection = projection();
-	trans = translation(0, 0., 40.f);
+	trans = translation(0, 0., 80.f);
 
 	initParticulas();
 	setTexturas();
@@ -195,7 +195,7 @@ void scene_nieve::mainLoop()
 			veclocidad[index].y = aceleracion * time::delta_time().count(); //Vf = a*t + Vo
 
 			swing = time::elapsed_time().count() - born[i];
-			positions[i].x += cos(swing) * time::delta_time().count() * 2; //a*T
+			positions[i].x += cos(swing) * time::delta_time().count() * 5; //a*T
 
 			veclocidad[index].x = random(-1, 1); //Vf = a*t + Vo
 
@@ -360,10 +360,10 @@ void scene_nieve::normalKeysDown(unsigned char key)
 		moverCamara.z += 1;
 		break;
 	case 'w':
-		moverCamara.x += 1;
+		moverCamara.x -= 1;
 		break;
 	case 's':
-		moverCamara.x -= 1;
+		moverCamara.x += 1;
 		break;
 	}
 }
