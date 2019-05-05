@@ -25,7 +25,7 @@ void scene_proyecto::init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Projection = projection();
-	trans = translation(0, 0., 40.f);
+	trans = translation(0, 0., 80.f);
 
 	initParticulas();
 	setTexturas();
@@ -192,7 +192,7 @@ void scene_proyecto::mainLoop()
 
 			particulas[i].distance = calculateDistance(index);
 			positions[index].y -= veclocidad[index].y;
-			veclocidad[index].y = aceleracion * time::delta_time().count(); //Vf = a*t + Vo
+			veclocidad[index].y = aceleracion * time::delta_time().count() * 2; //Vf = a*t + Vo
 
 			// Model = rotateX(0) * rotateY(0) * rotateZ(0) * scale * translation(positions[index].x, positions[index].y, positions[index].z);
 			// rotX, rotY, rotZ y scale se eliminan = identidad
@@ -363,10 +363,10 @@ void scene_proyecto::normalKeysDown(unsigned char key)
 		moverCamara.z += 1;
 		break;
 	case 'w':
-		moverCamara.x += 1;
+		moverCamara.x -= 1;
 		break;
 	case 's':
-		moverCamara.x -= 1;
+		moverCamara.x += 1;
 		break;
 	}
 }

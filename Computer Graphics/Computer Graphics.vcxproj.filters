@@ -108,9 +108,4 @@
     <None Include="shaders\particulas.vert" />
     <None Include="shaders\particulas.frag" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\..\..\Downloads\drop.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
 </Project>
