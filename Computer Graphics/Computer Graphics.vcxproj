@@ -47,6 +47,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\depth_buffer.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\scene_circle.cpp" />
     <ClCompile Include="src\scene_circle_grid.cpp" />
@@ -72,6 +73,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\depth_buffer.h" />
     <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\scene_circle.h" />
     <ClInclude Include="include\scene_circle_grid.h" />
@@ -93,9 +95,13 @@
     <None Include="shaders\circle_grid.vert" />
     <None Include="shaders\cube.frag" />
     <None Include="shaders\cube.vert" />
+    <None Include="shaders\depth.frag" />
+    <None Include="shaders\depth.vert" />
     <None Include="shaders\grid.vert" />
     <None Include="shaders\particulas.frag" />
     <None Include="shaders\particulas.vert" />
+    <None Include="shaders\shadow.frag" />
+    <None Include="shaders\shadow.vert" />
     <None Include="shaders\simple_pass.vert" />
     <None Include="shaders\solid_color.frag" />
     <None Include="shaders\sphere.vert" />

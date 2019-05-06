@@ -17,7 +17,6 @@ scene_cube::~scene_cube()
 
 void scene_cube::init()
 {
-
 	//Matriz de modelo translation*rotation*scale
 	scale = scaleM();
 	trans = translation();
@@ -35,7 +34,6 @@ void scene_cube::init()
 		14, 13, 12, 12, 15, 14, //Left
 		16, 17, 18, 18, 19, 16, //Top
 		20, 21, 22, 22, 23, 20,//Bottom
-
 	};
 
 	setColors();
@@ -76,13 +74,13 @@ void scene_cube::init()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	// Creacion y configuracion del buffer del atributo de las normales
 	glGenBuffers(1, &normalsVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, normalsVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec3) * normals.size(), normals.data(), GL_STATIC_DRAW);
-	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 
 	glBindVertexArray(0); //unbind vao
 
@@ -104,10 +102,11 @@ void scene_cube::init()
 	ilBindImage(0);
 	ilDeleteImages(1, &imageID);
 
-	//repetir cerdo
+	//Creación del buffer de profundidad
+	depthBuffer.create(2048);
 
 	ifile shader_file;
-	shader_file.read("shaders/cube.vert");
+	/*shader_file.read("shaders/cube.vert");
 	std::string vertex_source = shader_file.get_contents();
 	const GLchar* vertex_source_c = (const GLchar*)vertex_source.c_str();
 	GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -135,25 +134,104 @@ void scene_cube::init()
 	const GLchar* fragment_source_c = (const GLchar*)fragment_source.c_str();
 	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragment_shader, 1, &fragment_source_c, nullptr);
-	glCompileShader(fragment_shader);
+	glCompileShader(fragment_shader);*/
 
-	// Revision de errores de compilacion del fragment shader
-	GLint fragment_compiled;
-	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &fragment_compiled);
-	if (fragment_compiled != GL_TRUE)
+	shader_file.read("shaders/depth.vert");
+	std::string vertex_source = shader_file.get_contents();
+	const GLchar* vertex_source_c = (const GLchar*)vertex_source.c_str();
+	GLuint depth_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(depth_vertex_shader, 1, &vertex_source_c, nullptr);
+	glCompileShader(depth_vertex_shader);
+
+	// Revision de errores de compilacion del vertex shader
+	GLint depth_vertex_compiled;
+	glGetShaderiv(depth_vertex_shader, GL_COMPILE_STATUS, &depth_vertex_compiled);
+	if (depth_vertex_compiled != GL_TRUE)
 	{
 		GLint log_length;
-		glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
+		glGetShaderiv(depth_vertex_shader, GL_INFO_LOG_LENGTH, &log_length);
 
 		std::vector<GLchar> log;
 		log.resize(log_length);
-		glGetShaderInfoLog(fragment_shader, log_length, &log_length, &log[0]);
+		glGetShaderInfoLog(depth_vertex_shader, log_length, &log_length, &log[0]);
+		std::cout << "Syntax errors in vertex shader: " << std::endl;
+		for (auto& c : log) std::cout << c;
+		std::cout << std::endl;
+	}
+
+	shader_file.read("shaders/depth.frag");
+	std::string fragment_source = shader_file.get_contents();
+	const GLchar* fragment_source_c = (const GLchar*)fragment_source.c_str();
+	GLuint depth_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(depth_fragment_shader, 1, &fragment_source_c, nullptr);
+	glCompileShader(depth_fragment_shader);
+
+	// Revision de errores de compilacion del fragment shader
+	GLint depth_fragment_compiled;
+	glGetShaderiv(depth_fragment_shader, GL_COMPILE_STATUS, &depth_fragment_compiled);
+	if (depth_fragment_compiled != GL_TRUE)
+	{
+		GLint log_length;
+		glGetShaderiv(depth_fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
+
+		std::vector<GLchar> log;
+		log.resize(log_length);
+		glGetShaderInfoLog(depth_fragment_shader, log_length, &log_length, &log[0]);
+		std::cout << "Syntax errors in fragment shader: " << std::endl;
+		for (auto& c : log) std::cout << c;
+		std::cout << std::endl;
+	}
+
+
+	//Shadow Shaders
+	shader_file.read("shaders/shadow.vert");
+	vertex_source = shader_file.get_contents();
+	vertex_source_c = (const GLchar*)vertex_source.c_str();
+	GLuint shadow_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(shadow_vertex_shader, 1, &vertex_source_c, nullptr);
+	glCompileShader(shadow_vertex_shader);
+
+	// Revision de errores de compilacion del vertex shader
+	GLint shadow_vertex_compiled;
+	glGetShaderiv(shadow_vertex_shader, GL_COMPILE_STATUS, &shadow_vertex_compiled);
+	if (shadow_vertex_compiled != GL_TRUE)
+	{
+		GLint log_length;
+		glGetShaderiv(shadow_vertex_shader, GL_INFO_LOG_LENGTH, &log_length);
+
+		std::vector<GLchar> log;
+		log.resize(log_length);
+		glGetShaderInfoLog(shadow_vertex_shader, log_length, &log_length, &log[0]);
+		std::cout << "Syntax errors in vertex shader: " << std::endl;
+		for (auto& c : log) std::cout << c;
+		std::cout << std::endl;
+	}
+
+	shader_file.read("shaders/shadow.frag");
+	vertex_source = shader_file.get_contents();
+	fragment_source_c = (const GLchar*)vertex_source.c_str();
+	GLuint shadow_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(shadow_fragment_shader, 1, &fragment_source_c, nullptr);
+	glCompileShader(shadow_fragment_shader);
+	// Revision de errores de compilacion del fragment shader
+	GLint shadow_fragment_compiled;
+	glGetShaderiv(shadow_fragment_shader, GL_COMPILE_STATUS, &shadow_fragment_compiled);
+	if (shadow_fragment_compiled != GL_TRUE)
+	{
+		GLint log_length;
+		glGetShaderiv(shadow_fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
+
+		std::vector<GLchar> log;
+		log.resize(log_length);
+		glGetShaderInfoLog(shadow_fragment_shader, log_length, &log_length, &log[0]);
 		std::cout << "Syntax errors in fragment shader: " << std::endl;
 		for (auto& c : log) std::cout << c;
 		std::cout << std::endl;
 	}
 
 	shader_program = glCreateProgram();
+
+	/*
 	glAttachShader(shader_program, vertex_shader);
 	glAttachShader(shader_program, fragment_shader);
 
@@ -162,11 +240,28 @@ void scene_cube::init()
 	glBindAttribLocation(shader_program, 1, "InterpolatedColor");
 	glBindAttribLocation(shader_program, 2, "TexturePosition");
 	glBindAttribLocation(shader_program, 3, "VertexNormal");
+	glBindAttribLocation(shader_program, 4, "FloorPosition");
 	glLinkProgram(shader_program);
 
 	// Borramos los shaders, porque ya tenemos el ejecutable
 	glDeleteShader(vertex_shader);
 	glDeleteShader(fragment_shader);
+
+	glUseProgram(shader_program);*/
+
+	glAttachShader(shader_program, depth_vertex_shader);
+	glAttachShader(shader_program, depth_fragment_shader);
+
+	glBindAttribLocation(shader_program, 0, "VertexPosition");
+	glLinkProgram(shader_program);
+
+	// Borramos los shaders, porque ya tenemos el ejecutable
+	glDeleteShader(depth_vertex_shader);
+	glDeleteShader(depth_fragment_shader);
+
+	// Shadow
+	glAttachShader(shader_program, shadow_vertex_shader);
+	glAttachShader(shader_program, shadow_fragment_shader);
 
 	glUseProgram(shader_program);
 
@@ -176,16 +271,17 @@ void scene_cube::init()
 
 	//cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
 	GLuint lightpos_location = glGetUniformLocation(shader_program, "LightPosition");
-	glUniform3f(lightpos_location, 10.0f, 10.0f, 10.0f);
-
+	glUniform3f(lightpos_location, 0.0f, 0.0f, -10.0f);
 
 	GLuint campos_location = glGetUniformLocation(shader_program, "CameraPosition");
 	glUniform3f(campos_location, 0.0f, 0.0f, 10.0f);
 	
 	GLuint texture1_location = glGetUniformLocation(shader_program, "text1");
 	glUniform1i(texture1_location, 0);
-	GLuint texture2_location = glGetUniformLocation(shader_program, "text2");
-	glUniform1i(texture2_location, 1);
+
+	// Borramos los shaders, porque ya tenemos el ejecutable
+	glDeleteShader(shadow_vertex_shader);
+	glDeleteShader(shadow_fragment_shader);
 
 	glUseProgram(0);
 
@@ -205,7 +301,11 @@ void scene_cube::sleep()
 
 void scene_cube::mainLoop()
 {
+
 	float iTime = time::elapsed_time().count();
+
+	//Bind depth
+	depthBuffer.unbind();
 
 	rotZ = rotateZ(iTime);
 	rotY = rotateY(iTime);
@@ -225,18 +325,20 @@ void scene_cube::mainLoop()
 
 	glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
 	glBindTexture(GL_TEXTURE_2D, textureId); // Activan la textura en ese bucket
-	//cerdo
 
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
+	glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
 
 	// Dibuja su geometría
 	glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
 	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura
-	//cerdo
 
 	glUseProgram(0);
+
+	//Unbind depth
+	depthBuffer.unbind();
+	glViewport(0, 0, 400, 400);
 }
 
 void scene_cube::resize(int width, int height)
@@ -307,22 +409,22 @@ cgmath::mat4 scene_cube::camera()
 		cgmath::vec4(1., 0., 0., 0.),
 		cgmath::vec4(0., 1., 0., 0.),
 		cgmath::vec4(0., 0., 1., 0.),
-		cgmath::vec4(0., 0., 10., 1.)
+		cgmath::vec4(0., 0., 30., 1.)
 	);
 
 }
 
 cgmath::mat4 scene_cube::projection()
 {
-	float near = 1.0f;
-	float far = 1000.f;
+	float Near = 1.0f;
+	float Far = 1000.f;
 	float fov = radians(60.);
 
 	return cgmath::mat4(
 		cgmath::vec4(1. / (aspect*tan(fov / 2.)), 0., 0., 0.),
 		cgmath::vec4(0., 1. / (tan(fov / 2.)), 0., 0.),
-		cgmath::vec4(0., 0., -((far + near) / (far - near)), -1.),
-		cgmath::vec4(0., 0., -((2 * far*near) / (far - near)), 1.)
+		cgmath::vec4(0., 0., -((Far + Near) / (Far - Near)), -1.),
+		cgmath::vec4(0., 0., -((2 * Far*Near) / (Far - Near)), 1.)
 	);
 }
 
@@ -363,6 +465,12 @@ void scene_cube::createCube()
 	positions.push_back(cgmath::vec3(x, -y, z)); //v3 - 21
 	positions.push_back(cgmath::vec3(x, -y, -z)); //v7 - 22
 	positions.push_back(cgmath::vec3(-x, -y, -z)); //v8 - 23
+
+	//Floor
+	positions.push_back(cgmath::vec3(-20, -y - 1, 50)); //v2 - 24
+	positions.push_back(cgmath::vec3(20, -y - 1, 50)); //v3 - 25
+	positions.push_back(cgmath::vec3(20, -y - 1, -50)); //v7 - 26
+	positions.push_back(cgmath::vec3(-20, -y - 1, -50)); //v8 - 27
 }
 
 void scene_cube::setColors()

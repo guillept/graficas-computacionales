@@ -146,6 +146,18 @@ void scene_fuego::init()
 	glDeleteShader(fragment_shader);
 
 	glUseProgram(shader_program);
+
+	// cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightcolor_location = glGetUniformLocation(shader_program, "LightColor");
+	glUniform3f(lightcolor_location, 1.0f, 1.0f, 1.0f);
+
+	//cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightpos_location = glGetUniformLocation(shader_program, "LightPosition");
+	glUniform3f(lightpos_location, 0.0f, 0.0f, -bound - 10);
+
+	GLuint campos_location = glGetUniformLocation(shader_program, "CameraPosition");
+	glUniform3f(campos_location, 0.0f, 0.0f, 80.f);
+
 	GLuint texture1_location = glGetUniformLocation(shader_program, "texture");
 	glUniform1i(texture1_location, 0);
 
@@ -207,6 +219,10 @@ void scene_fuego::mainLoop()
 			billboard();
 			// mxpMatrix = Projection * View * Model;
 			mxpMatrix = Projection * ViewModel;
+
+			GLuint model_location = glGetUniformLocation(shader_program, "modelMatrix");
+			glUniformMatrix4fv(model_location, 1, GL_FALSE, &Model[0][0]);
+
 			GLuint mxpMatrix_location = glGetUniformLocation(shader_program, "mxpMatrix");
 			glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
 

@@ -6,6 +6,7 @@
 #include "vec4.h"
 #include "mat3.h"
 #include "mat4.h"
+#include "depth_buffer.h"
 
 #include <vector>
 
@@ -44,7 +45,7 @@ public:
 private:
 	GLuint shader_program;
 	GLuint vao;
-	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO, normalsVBO;
+	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO, normalsVBO, floorVBO;
 
 	GLfloat x = 3.f, y = 3.f, z = 3.f, aspect = 1.0f;
 
@@ -58,7 +59,11 @@ private:
 	std::vector<cgmath::vec3> colors;
 	std::vector<cgmath::vec2> textura;
 	std::vector<cgmath::vec3> normals;
+	std::vector<cgmath::vec3> floor;
 
 	ILuint imageID;
 	GLuint textureId;
+
+	//depth buffer
+	depth_buffer depthBuffer;
 };
