@@ -17,28 +17,31 @@ depth_buffer::~depth_buffer()
 void depth_buffer::create(int resolution)
 {
 	glGenFramebuffers(1, &_framebuffer);
-	glGenTextures(1, &_dephtmap);
 	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 
-	bindDepthMap();
 	_resolution = resolution;
+	glGenTextures(1, &_dephtmap);
+	bindDepthMap();
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _dephtmap, 0);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _resolution, _resolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _dephtmap, 0);
+	
 	unbind();
 
 }
 
 void depth_buffer::bind()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 	glViewport(0, 0, _resolution, _resolution);
+	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
+	glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void depth_buffer::unbind()

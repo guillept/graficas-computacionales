@@ -37,13 +37,14 @@ public:
 	cgmath::mat4 translation();
 	cgmath::mat4 camera();
 	cgmath::mat4 projection();
+	cgmath::mat4 ortographicProjection();
 	void createCube();
 	void setColors();
 	void createTexturas();
 	void createNormales();
 
 private:
-	GLuint shader_program;
+	GLuint shader_program_depth, shader_program_shadow;
 	GLuint vao;
 	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO, normalsVBO, floorVBO;
 
@@ -53,6 +54,7 @@ private:
 
 	cgmath::mat4 rotX, rotY, rotZ, scale, trans;
 	cgmath::mat4 Projection, View, Model;
+	cgmath::mat4 ViewLuz, OrtoProj, LightVPMatrix;
 	cgmath::mat4 mxpMatrix;
 
 	std::vector<cgmath::vec3> positions;
@@ -62,8 +64,10 @@ private:
 	std::vector<cgmath::vec3> floor;
 
 	ILuint imageID;
-	GLuint textureId;
+	GLuint textureId, textureFloorId;
 
 	//depth buffer
 	depth_buffer depthBuffer;
+
+	cgmath::mat4 camaraLuz;
 };

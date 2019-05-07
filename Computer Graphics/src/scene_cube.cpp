@@ -10,9 +10,9 @@
 
 scene_cube::~scene_cube()
 {
-	// Borramos la memoria del ejecutable cuando
-	// la escena deja de existir.
-	glDeleteProgram(shader_program);
+	// Borramos la memoria del ejecutable cuando la escena deja de existir.
+	glDeleteProgram(shader_program_depth);
+	glDeleteProgram(shader_program_shadow);
 }
 
 void scene_cube::init()
@@ -23,6 +23,11 @@ void scene_cube::init()
 	cgmath::mat4 matrizDeCamara = camera();
 	View = cgmath::mat4::inverse(matrizDeCamara);
 	Projection = projection();
+
+	cgmath::mat4 camaraLuz = camera();
+	ViewLuz = cgmath::mat4::inverse(camaraLuz);
+	OrtoProj = ortographicProjection();
+	LightVPMatrix = ViewLuz * OrtoProj;
 
 	createCube();
 
@@ -84,10 +89,10 @@ void scene_cube::init()
 
 	glBindVertexArray(0); //unbind vao
 
+	//Caja
 	ilGenImages(1, &imageID);
 	ilBindImage(imageID);
 	ilLoadImage("images/crate.png");
-
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //minificacion
@@ -100,7 +105,27 @@ void scene_cube::init()
 		ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData()); //IL_IMAGE_TYPE
 
 	ilBindImage(0);
-	ilDeleteImages(1, &imageID);
+
+
+	ilDeleteImages(2, &imageID);
+
+	//Floor
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+	ilLoadImage("images/floor.jpg");
+	glGenTextures(1, &textureFloorId);
+	glBindTexture(GL_TEXTURE_2D, textureFloorId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //minificacion
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //magnificacion
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //Coordenda S
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //Coordenada T
+
+	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT),
+		ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT), 0,
+		ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), ilGetData()); //IL_IMAGE_TYPE
+
+	ilBindImage(0);
+	ilDeleteImages(2, &imageID);
 
 	//Creación del buffer de profundidad
 	depthBuffer.create(2048);
@@ -229,9 +254,8 @@ void scene_cube::init()
 		std::cout << std::endl;
 	}
 
-	shader_program = glCreateProgram();
-
 	/*
+	shader_program = glCreateProgram();
 	glAttachShader(shader_program, vertex_shader);
 	glAttachShader(shader_program, fragment_shader);
 
@@ -249,39 +273,52 @@ void scene_cube::init()
 
 	glUseProgram(shader_program);*/
 
-	glAttachShader(shader_program, depth_vertex_shader);
-	glAttachShader(shader_program, depth_fragment_shader);
+	//Depth Shader
+	shader_program_depth = glCreateProgram();
+	glAttachShader(shader_program_depth, depth_vertex_shader);
+	glAttachShader(shader_program_depth, depth_fragment_shader);
 
-	glBindAttribLocation(shader_program, 0, "VertexPosition");
-	glLinkProgram(shader_program);
+	// Asignar Buffer a variables de IN en VertexShader
+	glBindAttribLocation(shader_program_depth, 0, "VertexPosition");
+	glLinkProgram(shader_program_depth);
 
 	// Borramos los shaders, porque ya tenemos el ejecutable
 	glDeleteShader(depth_vertex_shader);
 	glDeleteShader(depth_fragment_shader);
 
+	glUseProgram(shader_program_depth);
+
 	// Shadow
-	glAttachShader(shader_program, shadow_vertex_shader);
-	glAttachShader(shader_program, shadow_fragment_shader);
+	shader_program_shadow = glCreateProgram();
+	glAttachShader(shader_program_shadow, shadow_vertex_shader);
+	glAttachShader(shader_program_shadow, shadow_fragment_shader);
 
-	glUseProgram(shader_program);
-
-	// cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
-	GLuint lightcolor_location = glGetUniformLocation(shader_program, "LightColor");
-	glUniform3f(lightcolor_location, 1.0f, 1.0f, 1.0f);
-
-	//cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
-	GLuint lightpos_location = glGetUniformLocation(shader_program, "LightPosition");
-	glUniform3f(lightpos_location, 0.0f, 0.0f, -10.0f);
-
-	GLuint campos_location = glGetUniformLocation(shader_program, "CameraPosition");
-	glUniform3f(campos_location, 0.0f, 0.0f, 10.0f);
-	
-	GLuint texture1_location = glGetUniformLocation(shader_program, "text1");
-	glUniform1i(texture1_location, 0);
+	// Asignar Buffer a variables de IN en VertexShader
+	glBindAttribLocation(shader_program_shadow, 0, "VertexPosition");
+	glBindAttribLocation(shader_program_shadow, 1, "InterpolatedColor");
+	glBindAttribLocation(shader_program_shadow, 2, "TexturePosition");
+	glBindAttribLocation(shader_program_shadow, 3, "VertexNormal");
+	glLinkProgram(shader_program_shadow);
 
 	// Borramos los shaders, porque ya tenemos el ejecutable
 	glDeleteShader(shadow_vertex_shader);
 	glDeleteShader(shadow_fragment_shader);
+
+	glUseProgram(shader_program_shadow);
+
+	// cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightcolor_location = glGetUniformLocation(shader_program_shadow, "LightColor");
+	glUniform3f(lightcolor_location, 1.0f, 1.0f, 1.0f);
+
+	//cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightpos_location = glGetUniformLocation(shader_program_shadow, "LightPosition");
+	glUniform3f(lightpos_location, 0.0f, 0.0f, -10.0f);
+
+	GLuint campos_location = glGetUniformLocation(shader_program_shadow, "CameraPosition");
+	glUniform3f(campos_location, 0.0f, 0.0f, 10.0f);
+	
+	GLuint texture1_location = glGetUniformLocation(shader_program_shadow, "texture");
+	glUniform1i(texture1_location, 0);
 
 	glUseProgram(0);
 
@@ -304,9 +341,6 @@ void scene_cube::mainLoop()
 
 	float iTime = time::elapsed_time().count();
 
-	//Bind depth
-	depthBuffer.unbind();
-
 	rotZ = rotateZ(iTime);
 	rotY = rotateY(iTime);
 	rotX = rotateX(iTime);
@@ -314,31 +348,52 @@ void scene_cube::mainLoop()
 	Model = rotX * rotY * rotZ * scale * trans;
 	mxpMatrix = Projection * View * Model;
 
+	//Bind depth
+	// Activar el framebuffer personalizado. Limpiar los buffers de profundidad y color.
+	depthBuffer.bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(shader_program);
+	// Activar los shaders Depth.vert y Depth.frag
+	glUseProgram(shader_program_depth);
+	// Configurar la matriz mvp para cada geometría y renderear la escena.
+	GLuint mxpMatrix_location = glGetUniformLocation(shader_program_depth, "mxpMatrix");
 
-	GLuint mxpMatrix_location = glGetUniformLocation(shader_program, "mxpMatrix");
+	// Desactivar los shaders Depth.vert y Depth.frag
+	glUseProgram(0);
+	//Unbind depth
+	// Desactivar el framebuffer personalizado. Regresar el viewport al tamaño de la ventana.
+	depthBuffer.unbind();
+	glViewport(0, 0, 400, 400);
+
+	// Limpiar los buffers de profundidad y color.
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Activar los shaders shaders de dibujado sombras Shadow.vert y Shadow.frag
+	glUseProgram(shader_program_shadow);
+	// Configurar todos los uniforms y matrices necesarios para phong shading. - init
+	// Enviar la matriz de vista. Enviar la matriz de vista-proyección de la cámara en posición luz.
+	// Hacer bind del mapa de profundidad y las texturas cada geometría.
+	mxpMatrix_location = glGetUniformLocation(shader_program_shadow, "mxpMatrix");
 	glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
 
-	GLuint model_location = glGetUniformLocation(shader_program, "modelMatrix");
+	GLuint lightmvp_location = glGetUniformLocation(shader_program_shadow, "LightVPMatrix");
+	glUniformMatrix4fv(lightmvp_location, 1, GL_FALSE, &LightVPMatrix[0][0]);
+
+	GLuint model_location = glGetUniformLocation(shader_program_shadow, "modelMatrix");
 	glUniformMatrix4fv(model_location, 1, GL_FALSE, &Model[0][0]);
 
 	glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
 	glBindTexture(GL_TEXTURE_2D, textureId); // Activan la textura en ese bucket
-
+	
+	// Renderear la escena
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
-
 	// Dibuja su geometría
 	glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
+
+	// Desactivar los  shaders y las texturas.
 	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura
 
 	glUseProgram(0);
-
-	//Unbind depth
-	depthBuffer.unbind();
-	glViewport(0, 0, 400, 400);
 }
 
 void scene_cube::resize(int width, int height)
@@ -425,6 +480,24 @@ cgmath::mat4 scene_cube::projection()
 		cgmath::vec4(0., 1. / (tan(fov / 2.)), 0., 0.),
 		cgmath::vec4(0., 0., -((Far + Near) / (Far - Near)), -1.),
 		cgmath::vec4(0., 0., -((2 * Far*Near) / (Far - Near)), 1.)
+	);
+}
+
+
+cgmath::mat4 scene_cube::ortographicProjection()
+{
+	float Near = 1.0f;
+	float Far = 1000.f;
+	float right = 1;
+	float left = 1;
+	float top = 1;
+	float bottom = 1;
+
+	return cgmath::mat4(
+		cgmath::vec4(2. / (right-left), 0., 0., -((right + left) / (right - left))),
+		cgmath::vec4(0., 2. / (top-bottom), 0., -((top + bottom) / (top - bottom))),
+		cgmath::vec4(0., 0., -2 / (Far - Near), -((Far + Near) / (Far - Near))),
+		cgmath::vec4(0., 0., 0, 1.)
 	);
 }
 
