@@ -132,5 +132,7 @@
     <None Include="shaders\depth.frag" />
     <None Include="shaders\shadow.frag" />
     <None Include="shaders\shadow.vert" />
+    <None Include="shaders\floor.frag" />
+    <None Include="shaders\floor.vert" />
   </ItemGroup>
 </Project>

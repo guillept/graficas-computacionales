@@ -91,6 +91,8 @@
     <ClInclude Include="include\schene_chaikin.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\floor.frag" />
+    <None Include="shaders\floor.vert" />
     <None Include="shaders\circle.frag" />
     <None Include="shaders\circle_grid.vert" />
     <None Include="shaders\cube.frag" />

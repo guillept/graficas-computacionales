@@ -1,9 +1,9 @@
 #version 330
 
 in vec3 VertexPosition ;
-uniform mat4 mvpMatrix ;
+uniform mat4 mxpMatrix ;
 
 void main ()
 {
-	gl_Position = mvpMatrix * vec4(VertexPosition , 1.0f);
+	gl_Position = mxpMatrix * vec4(VertexPosition , 1.0f);
 }

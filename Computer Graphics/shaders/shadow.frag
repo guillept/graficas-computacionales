@@ -41,12 +41,12 @@ void main() {
 	// Diffuse component - 	difusse = normalize(Light) * normalize(PixelNormal);
 	vec3 L = normalize(LightPosition - PixelPosition);
 	vec3 N = normalize(PixelNormal);
-	vec3 diffuse = max(dot(N, L), 0.0f) * normalize(LightColor);
+	vec3 diffuse = max(dot(N, L), 0.0f) * LightColor;
 
 	// Specular component -	CamaraPosition = cos(R, V) *  LightColor;
 	vec3 R = reflect(-L, PixelNormal);
 	vec3 V = normalize(CameraPosition - PixelPosition);
-	vec3 specular = 0.5 * pow(dot(V, R), 32) * LightColor;
+	vec3 specular = 0.5 * pow(max(dot(V, R), 0.0f), 32) * LightColor;
 
 	float shadow = IsPixelOccluded(PixelPositionLightSpace);
 	vec3 phong = ambiental + (1.0f - shadow) * (diffuse + specular);

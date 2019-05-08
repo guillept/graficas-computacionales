@@ -26,5 +26,5 @@ void main()
 	gl_Position = mxpMatrix * vec4(VertexPosition, 1.0f);
 	TextureColor = TexturePosition;
 
-	PixelPositionLightSpace=LightVPMatrix*vec4(PixelPosition, 1.0);
+	PixelPositionLightSpace=LightVPMatrix*vec4(PixelPosition, 1.0); 
 }
