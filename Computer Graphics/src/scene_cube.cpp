@@ -25,10 +25,18 @@ void scene_cube::init()
 	View = cgmath::mat4::inverse(matrizDeCamara);
 	Projection = projection();
 
-	cgmath::mat4 camaraLuz = camera(cgmath::vec3(0, 15., 30.));
+	float angleRotX = 20.;
+	cgmath::mat4 camRotX(
+		cgmath::vec4(1, 0, 0, 0),
+		cgmath::vec4(0, cos(radians(angleRotX)), sin(radians(angleRotX)), 0),
+		cgmath::vec4(0, -sin(radians(angleRotX)), cos(radians(angleRotX)), 0),
+		cgmath::vec4(0, 0, 0, 1)
+	);
+
+	cgmath::mat4 camaraLuz = camRotX * camera(cgmath::vec3(0, 0., 30.));
 	ViewLuz = cgmath::mat4::inverse(camaraLuz);
 	OrtoProj = ortographicProjection();
-	LightVPMatrix = ViewLuz * OrtoProj;
+	LightVPMatrix = OrtoProj * ViewLuz;
 
 	createCube();
 
@@ -120,7 +128,15 @@ void scene_cube::init()
 	glBindBuffer(GL_ARRAY_BUFFER, texturasFloorVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * texturaFloor.size(), texturaFloor.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	// Creacion y configuracion del buffer del atributo de textura
+	glGenBuffers(1, &floorNormalsVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, floorNormalsVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * floorNormals.size(), floorNormals.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0); //unbind vao
@@ -402,38 +418,19 @@ void scene_cube::first_render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(shader_program_depth);
-	ModelFloor = scale * trans;
-	mxpFloorMatrix = Projection * View * ModelFloor;
+	mxpFloorMatrix = OrtoProj * ViewLuz;
 
 	GLuint mxpMatrix_location_floor = glGetUniformLocation(shader_program_depth, "mxpMatrix");
 	glUniformMatrix4fv(mxpMatrix_location_floor, 1, GL_FALSE, &mxpFloorMatrix[0][0]);
-
-	/*glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
-	glBindTexture(GL_TEXTURE_2D, textureFloorId); // Activan la textura en ese bucket*/
 
 	glBindVertexArray(vaoFloor);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
 
-	// Desactivar los  shaders y las texturas.
-	/*glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
-	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura*/
-
-	glUseProgram(0);
-
-	// Activar los shaders Depth.vert y Depth.frag
-	glUseProgram(shader_program_depth);
-
 	// Configurar la matriz mvp para cada geometría y renderear la escena.
+	mxpMatrix = OrtoProj * ViewLuz * Model;
 	GLuint mxpMatrix_location = glGetUniformLocation(shader_program_depth, "mxpMatrix");
 	glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
-	
-	//vista y proyeccion de la luz
-	GLuint lightmvp_location = glGetUniformLocation(shader_program_shadow, "LightVPMatrix");
-	glUniformMatrix4fv(lightmvp_location, 1, GL_FALSE, &LightVPMatrix[0][0]);
-
-	GLuint model_location = glGetUniformLocation(shader_program_shadow, "modelMatrix");
-	glUniformMatrix4fv(model_location, 1, GL_FALSE, &Model[0][0]);
 	
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
@@ -452,36 +449,47 @@ void scene_cube::second_render() {
 	// Limpiar los buffers de profundidad y color.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(shader_program_depth);
-	ModelFloor = scale * trans;
-	mxpFloorMatrix = Projection * View * ModelFloor;
+	// Activar los shaders shaders de dibujado sombras Shadow.vert y Shadow.frag
+	glUseProgram(shader_program_shadow);
+	ModelFloor = cgmath::mat4(1.0);
+	mxpFloorMatrix = Projection * View;
 
-	GLuint mxpMatrix_location_floor = glGetUniformLocation(shader_program_depth, "mxpMatrix");
-	glUniformMatrix4fv(mxpMatrix_location_floor, 1, GL_FALSE, &mxpFloorMatrix[0][0]);
+	// Configurar todos los uniforms y matrices necesarios para phong shading. - init
+	// Enviar la matriz de vista. Enviar la matriz de vista-proyección de la cámara en posición luz.
+	// Hacer bind del mapa de profundidad y las texturas cada geometría. 
+	GLuint mxpMatrix_location_ligth = glGetUniformLocation(shader_program_shadow, "mxpMatrix");
+	glUniformMatrix4fv(mxpMatrix_location_ligth, 1, GL_FALSE, &mxpFloorMatrix[0][0]);
 
-	/*glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
-	glBindTexture(GL_TEXTURE_2D, textureFloorId); // Activan la textura en ese bucket*/
+	GLuint lightmvp_location = glGetUniformLocation(shader_program_shadow, "LightVPMatrix");
+	glUniformMatrix4fv(lightmvp_location, 1, GL_FALSE, &LightVPMatrix[0][0]);
 
+	GLuint model_location_ligth = glGetUniformLocation(shader_program_shadow, "modelMatrix");
+	glUniformMatrix4fv(model_location_ligth, 1, GL_FALSE, &ModelFloor[0][0]);
+
+	glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
+	glBindTexture(GL_TEXTURE_2D, textureFloorId); // Activan la textura en ese bucket
+
+	glActiveTexture(GL_TEXTURE1);
+	depthBuffer.bindDepthMap();
+
+	// Renderear la escena
 	glBindVertexArray(vaoFloor);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
 
 	// Desactivar los  shaders y las texturas.
-	/*glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
-	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura*/
+	glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
+	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura
 
-	glUseProgram(0);
+	glActiveTexture(GL_TEXTURE1);
+	depthBuffer.unbindDepthMap();
 
-	// Activar los shaders shaders de dibujado sombras Shadow.vert y Shadow.frag
-	glUseProgram(shader_program_shadow);
 	// Configurar todos los uniforms y matrices necesarios para phong shading. - init
 	// Enviar la matriz de vista. Enviar la matriz de vista-proyección de la cámara en posición luz.
 	// Hacer bind del mapa de profundidad y las texturas cada geometría. 
+	mxpMatrix = Projection * View * Model;
 	GLuint mxpMatrix_location = glGetUniformLocation(shader_program_shadow, "mxpMatrix");
 	glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
-
-	GLuint lightmvp_location = glGetUniformLocation(shader_program_shadow, "LightVPMatrix");
-	glUniformMatrix4fv(lightmvp_location, 1, GL_FALSE, &LightVPMatrix[0][0]);
 
 	GLuint model_location = glGetUniformLocation(shader_program_shadow, "modelMatrix");
 	glUniformMatrix4fv(model_location, 1, GL_FALSE, &Model[0][0]);
@@ -492,19 +500,16 @@ void scene_cube::second_render() {
 	glActiveTexture(GL_TEXTURE1);
 	depthBuffer.bindDepthMap();
 
-
-	// Renderear la escena
+	//Renderear la escena
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
 
-	// Desactivar los  shaders y las texturas.
-	glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
+	glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
 	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura
 
 	glActiveTexture(GL_TEXTURE1);
 	depthBuffer.unbindDepthMap();
-	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura
 
 	glUseProgram(0);
 }
@@ -617,12 +622,12 @@ cgmath::mat4 scene_cube::projection()
 
 cgmath::mat4 scene_cube::ortographicProjection()
 {
-	float Near = 1.0f;
-	float Far = 1000.f;
-	float right = 100.5f; //entre mas grande mas cerca
-	float left = -100.5f;
-	float top = 100.5f;
-	float bottom = -100.5f;
+	float Near = -70.0f;
+	float Far = 70.f;
+	float right = 70.f; //entre mas grande mas cerca
+	float left = -70.f;
+	float top = 70.f;
+	float bottom = -70.f;
 
 	return cgmath::mat4(
 		cgmath::vec4(2. / (right - left), 0., 0., 0.),
@@ -704,42 +709,55 @@ void scene_cube::createTexturas()
 	}
 
 	texturaFloor.push_back(cgmath::vec2(1.0, 1.0));
-	texturaFloor.push_back(cgmath::vec2(1.0, 1.0));
-	texturaFloor.push_back(cgmath::vec2(1.0, 1.0));
-	texturaFloor.push_back(cgmath::vec2(1.0, 1.0));
+	texturaFloor.push_back(cgmath::vec2(1.0, 0.0));
+	texturaFloor.push_back(cgmath::vec2(0.0, 0.0));
+	texturaFloor.push_back(cgmath::vec2(0.0, 1.0));
 }
 
 void scene_cube::createNormales()
 {
+	//Front
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
 
+	//Rigth
 	normals.push_back(cgmath::vec3(1.0f, 0.0f, 0.0f));
 	normals.push_back(cgmath::vec3(1.0f, 0.0f, 0.0f));
 	normals.push_back(cgmath::vec3(1.0f, 0.0f, 0.0f));
 	normals.push_back(cgmath::vec3(1.0f, 0.0f, 0.0f));
 
+	//Back
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, -1.0f));
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, -1.0f));
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, -1.0f));
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, -1.0f));
 
+	//Left
 	normals.push_back(cgmath::vec3(-1.0f, 0.0f, 0.0f));
 	normals.push_back(cgmath::vec3(-1.0f, 0.0f, 0.0f));
 	normals.push_back(cgmath::vec3(-1.0f, 0.0f, 0.0f));
 	normals.push_back(cgmath::vec3(-1.0f, 0.0f, 0.0f));
 
+	//Top
 	normals.push_back(cgmath::vec3(0.0f, 1.0f, 0.0f));
 	normals.push_back(cgmath::vec3(0.0f, 1.0f, 0.0f));
 	normals.push_back(cgmath::vec3(0.0f, 1.0f, 0.0f));
 	normals.push_back(cgmath::vec3(0.0f, 1.0f, 0.0f));
 
+	//Bottom
 	normals.push_back(cgmath::vec3(0.0f, -1.0f, 0.0f));
 	normals.push_back(cgmath::vec3(0.0f, -1.0f, 0.0f));
 	normals.push_back(cgmath::vec3(0.0f, -1.0f, 0.0f));
 	normals.push_back(cgmath::vec3(0.0f, -1.0f, 0.0f));
+
+
+	//Floor
+	floorNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	floorNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	floorNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	floorNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
 
 }
 

@@ -50,7 +50,7 @@ private:
 	GLuint shader_program_depth, shader_program_shadow, shader_program_floor;
 	GLuint vao, vaoFloor;
 	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO, normalsVBO;
-	GLuint floorVBO, texturasFloorVBO, indicesFloorBuffer;
+	GLuint floorVBO, texturasFloorVBO, indicesFloorBuffer, floorNormalsVBO;
 
 	GLfloat x = 3.f, y = 3.f, z = 3.f, aspect = 1.0f;
 	GLfloat xFloor = 25.f, yFloor = 25.f, zFloor = 25.f;
@@ -66,6 +66,7 @@ private:
 	std::vector<cgmath::vec3> colors;
 	std::vector<cgmath::vec2> textura;
 	std::vector<cgmath::vec3> normals;
+	std::vector<cgmath::vec3> floorNormals;
 
 	std::vector<cgmath::vec3> floor;
 	std::vector<cgmath::vec2> texturaFloor;
