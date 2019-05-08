@@ -25,7 +25,8 @@ void scene_cube::init()
 	View = cgmath::mat4::inverse(matrizDeCamara);
 	Projection = projection();
 
-	float angleRotX = 20.;
+	float angleRotX = 30.;
+
 	cgmath::mat4 camRotX(
 		cgmath::vec4(1, 0, 0, 0),
 		cgmath::vec4(0, cos(radians(angleRotX)), sin(radians(angleRotX)), 0),
@@ -47,7 +48,7 @@ void scene_cube::init()
 		11, 10, 9, 9, 8, 11, //Back
 		14, 13, 12, 12, 15, 14, //Left
 		16, 17, 18, 18, 19, 16, //Top
-		20, 21, 22, 22, 23, 20,//Bottom
+		23, 22, 21, 21, 20, 23, //Bottom
 	};
 
 	setColors();
@@ -523,7 +524,7 @@ void scene_cube::mainLoop()
 	rotY = rotateY(iTime);
 	rotX = rotateX(iTime);
 
-	Model = rotX * rotY * rotZ * scale * trans;
+	Model = rotZ * rotY * rotX * scale * trans;
 	mxpMatrix = Projection * View * Model;
 
 	//Bind depth
@@ -547,10 +548,11 @@ float scene_cube::radians(float grados) {
 
 cgmath::mat4 scene_cube::rotateX(float iTime)
 {
+
 	return cgmath::mat4(
 		cgmath::vec4(1., 0., 0., 0.),
-		cgmath::vec4(0., cos(radians(30.)*iTime), sin(radians(30.)*iTime), 0.),
-		cgmath::vec4(0., -sin(radians(30.)*iTime), cos(radians(30.)*iTime), 0.),
+		cgmath::vec4(0., cos(radians(iTime)), sin(radians(iTime)), 0.),
+		cgmath::vec4(0., -sin(radians(iTime)), cos(radians(iTime)), 0.),
 		cgmath::vec4(0., 0., 0., 1.)
 	);
 }
