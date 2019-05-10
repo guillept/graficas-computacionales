@@ -51,7 +51,19 @@
     <ClCompile Include="src\scene_cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scene_proyecto.cpp">
+    <ClCompile Include="src\scene_lluvia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene_fuego.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene_nieve.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene_fuego.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\depth_buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,7 +104,16 @@
     <ClInclude Include="include\scene_cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\scene_proyecto.h">
+    <ClInclude Include="include\scene_lluvia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\scene_fuego.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\scene_nieve.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\depth_buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -107,5 +128,11 @@
     <None Include="shaders\cube.frag" />
     <None Include="shaders\particulas.vert" />
     <None Include="shaders\particulas.frag" />
+    <None Include="shaders\depth.vert" />
+    <None Include="shaders\depth.frag" />
+    <None Include="shaders\shadow.frag" />
+    <None Include="shaders\shadow.vert" />
+    <None Include="shaders\floor.frag" />
+    <None Include="shaders\floor.vert" />
   </ItemGroup>
 </Project>

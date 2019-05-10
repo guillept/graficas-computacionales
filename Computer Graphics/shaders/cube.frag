@@ -1,7 +1,7 @@
 #version 330
 
 uniform sampler2D text1;
-uniform sampler2D text2;
+// uniform sampler2D text2;
 uniform vec3 LightPosition;
 uniform vec3 LightColor;
 uniform vec3 CameraPosition;
@@ -29,7 +29,8 @@ void main() {
 	
 	vec3 phong = ambiental + diffuse + specular;
 
-	vec4 x = texture2D(text1, TextureColor);
-	vec4 y = texture2D(text2, TextureColor);
-	FragColor = mix(x, y, 0.1) * vec4(phong, 1.0f);
+	// vec4 x = texture2D(text1, TextureColor);
+	// vec4 y = texture2D(text2, TextureColor);
+	// FragColor = mix(x, y, 0.1) * vec4(phong, 1.0f);
+	FragColor = texture2D(text1, TextureColor) * vec4(phong, 1.0f);
 }

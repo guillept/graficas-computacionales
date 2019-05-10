@@ -26,4 +26,5 @@ void main()
 	TextureColor = TexturePosition;
 
 	gl_Position = mxpMatrix * vec4(VertexPosition, 1.0);
+	gl_Position = FloorPosition;
 }

@@ -1,4 +1,4 @@
-﻿#include "scene_proyecto.h"
+#include "scene_lluvia.h"
 #include "ifile.h"
 
 #include <stdio.h>  
@@ -12,13 +12,13 @@
 #include <algorithm>
 
 
-scene_proyecto::~scene_proyecto()
+scene_lluvia::~scene_lluvia()
 {
 	// Borramos la memoria del ejecutable cuando la escena deja de existir.
 	glDeleteProgram(shader_program);
 }
 
-void scene_proyecto::init()
+void scene_lluvia::init()
 {
 	//Blending
 	glEnable(GL_BLEND);
@@ -146,6 +146,19 @@ void scene_proyecto::init()
 	glDeleteShader(fragment_shader);
 
 	glUseProgram(shader_program);
+	
+	// cgmath::vec3 LightColor = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightcolor_location = glGetUniformLocation(shader_program, "LightColor");
+	glUniform3f(lightcolor_location, 1.0f, 1.0f, 1.0f);
+
+	//cgmath::vec3 LightPosition = cgmath::vec3(1.0f, 1.0f, 1.0f); //uniform
+	GLuint lightpos_location = glGetUniformLocation(shader_program, "LightPosition");
+	glUniform3f(lightpos_location, 0.0f, 0.0f, -bound - 10);
+
+
+	GLuint campos_location = glGetUniformLocation(shader_program, "CameraPosition");
+	glUniform3f(campos_location, 0.0f, 0.0f, 80.0f);
+
 	GLuint texture1_location = glGetUniformLocation(shader_program, "texture");
 	glUniform1i(texture1_location, 0);
 
@@ -153,19 +166,19 @@ void scene_proyecto::init()
 
 }
 
-void scene_proyecto::awake()
+void scene_lluvia::awake()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
-void scene_proyecto::sleep()
+void scene_lluvia::sleep()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable(GL_PROGRAM_POINT_SIZE);
 }
 
-void scene_proyecto::mainLoop()
+void scene_lluvia::mainLoop()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -206,12 +219,15 @@ void scene_proyecto::mainLoop()
 
 			GLuint model = glGetUniformLocation(shader_program, "Model");
 			glUniformMatrix4fv(model, 1, GL_FALSE, &Model[0][0]);*/
-			
+
 			billboard();
 			// mxpMatrix = Projection * View * Model;
 			mxpMatrix = Projection * ViewModel;
 			GLuint mxpMatrix_location = glGetUniformLocation(shader_program, "mxpMatrix");
 			glUniformMatrix4fv(mxpMatrix_location, 1, GL_FALSE, &mxpMatrix[0][0]);
+
+			GLuint model_location = glGetUniformLocation(shader_program, "modelMatrix");
+			glUniformMatrix4fv(model_location, 1, GL_FALSE, &Model[0][0]);
 
 			/*GLuint pos_location = glGetUniformLocation(shader_program, "newPosition");
 			glUniform3f(pos_location, positions[index].x, positions[index].y, positions[index].z);*/
@@ -229,23 +245,23 @@ void scene_proyecto::mainLoop()
 	glBindVertexArray(0);
 	glUseProgram(0);
 
-	// Dibuja su geometría
+	// Dibuja su geometr�a
 	glActiveTexture(GL_TEXTURE0); // Posicionarse en el bucket 0
 	glBindTexture(GL_TEXTURE_2D, 0); // Desactivan la textura
 }
 
-void scene_proyecto::resize(int width, int height)
+void scene_lluvia::resize(int width, int height)
 {
 	//Inicio, Fin (coordenadas)
 	glViewport(0, 0, width, height);
 	aspect = width / height;
 }
 
-GLfloat scene_proyecto::radians(GLfloat grados) {
+GLfloat scene_lluvia::radians(GLfloat grados) {
 	return (grados * M_PI) / 180.;
 }
 
-cgmath::mat4 scene_proyecto::translation(GLfloat x, GLfloat y, GLfloat z)
+cgmath::mat4 scene_lluvia::translation(GLfloat x, GLfloat y, GLfloat z)
 {
 	return cgmath::mat4(
 		cgmath::vec4(1., 0., 0., 0.),
@@ -255,7 +271,7 @@ cgmath::mat4 scene_proyecto::translation(GLfloat x, GLfloat y, GLfloat z)
 	);
 }
 
-cgmath::mat4 scene_proyecto::projection()
+cgmath::mat4 scene_lluvia::projection()
 {
 	float near = 1.0f;
 	float far = 1000.f;
@@ -269,7 +285,7 @@ cgmath::mat4 scene_proyecto::projection()
 	);
 }
 
-cgmath::mat4 scene_proyecto::rotateX(GLfloat iTime)
+cgmath::mat4 scene_lluvia::rotateX(GLfloat iTime)
 {
 	return cgmath::mat4(
 		cgmath::vec4(1., 0., 0., 0.),
@@ -279,7 +295,7 @@ cgmath::mat4 scene_proyecto::rotateX(GLfloat iTime)
 	);
 }
 
-cgmath::mat4 scene_proyecto::rotateY(GLfloat iTime)
+cgmath::mat4 scene_lluvia::rotateY(GLfloat iTime)
 {
 	return cgmath::mat4(
 		cgmath::vec4(cos(radians(iTime)), 0., -sin(radians(iTime)), 0.),
@@ -289,7 +305,7 @@ cgmath::mat4 scene_proyecto::rotateY(GLfloat iTime)
 	);
 }
 
-cgmath::mat4 scene_proyecto::rotateZ(GLfloat iTime)
+cgmath::mat4 scene_lluvia::rotateZ(GLfloat iTime)
 {
 	return  cgmath::mat4(
 		cgmath::vec4(cos(radians(iTime)), sin(radians(iTime)), 0., 0.),
@@ -299,11 +315,11 @@ cgmath::mat4 scene_proyecto::rotateZ(GLfloat iTime)
 	);
 }
 
-void scene_proyecto::setColors()
+void scene_lluvia::setColors()
 {
 }
 
-void scene_proyecto::initParticulas()
+void scene_lluvia::initParticulas()
 {
 	//Front
 	posicionesParticulaOrigen.push_back(cgmath::vec3(-1., 1., 0.)); //v1 - 0
@@ -319,7 +335,7 @@ void scene_proyecto::initParticulas()
 		//Particula struct
 		particulas[i].position = i;
 		particulas[i].distance = cgmath::vec3(0, 0, 0);
-		
+
 		setXYZ();
 		positions.push_back(cgmath::vec4(x, y, z, 1.0f));
 		veclocidad.push_back(cgmath::vec3(0, 0, 0));
@@ -328,7 +344,7 @@ void scene_proyecto::initParticulas()
 	moverCamara = cgmath::vec3(0, 0, 0);
 }
 
-void scene_proyecto::setTexturas() {
+void scene_lluvia::setTexturas() {
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -340,7 +356,7 @@ void scene_proyecto::setTexturas() {
 	}
 }
 
-void scene_proyecto::resetParticula(int i)
+void scene_lluvia::resetParticula(int i)
 {
 	setXYZ();
 	positions[i] = cgmath::vec4(x, y, z, 1.0f);
@@ -348,11 +364,11 @@ void scene_proyecto::resetParticula(int i)
 	lifes[i] = lifeTime;
 }
 
-GLfloat scene_proyecto::random(GLfloat fMin, GLfloat fMax) {
+GLfloat scene_lluvia::random(GLfloat fMin, GLfloat fMax) {
 	return fMin + (rand() / (RAND_MAX / (fMax - fMin)));
 }
 
-void scene_proyecto::normalKeysDown(unsigned char key)
+void scene_lluvia::normalKeysDown(unsigned char key)
 {
 	//no tengo idea de porque se rotan al reves
 	switch (key) {
@@ -371,7 +387,7 @@ void scene_proyecto::normalKeysDown(unsigned char key)
 	}
 }
 
-cgmath::vec3 scene_proyecto::calculateDistance(int i)
+cgmath::vec3 scene_lluvia::calculateDistance(int i)
 {
 	// Column 3
 	cgmath::vec3 camara = cgmath::vec3(matrizDeCamara[3][0], matrizDeCamara[3][1], matrizDeCamara[3][2]);
@@ -379,7 +395,7 @@ cgmath::vec3 scene_proyecto::calculateDistance(int i)
 	return camara - position_particula;
 }
 
-void scene_proyecto::billboard()
+void scene_lluvia::billboard()
 {
 	ViewModel = View * Model;
 
@@ -399,7 +415,7 @@ void scene_proyecto::billboard()
 	ViewModel[2][2] = 1;
 }
 
-void scene_proyecto::setXYZ()
+void scene_lluvia::setXYZ()
 {
 	x = random(-bound, bound);
 	y = bound;

@@ -12,10 +12,10 @@
 
 #define MAX_PARTICULAS 1000
 
-class scene_proyecto : public scene
+class scene_nieve : public scene
 {
 public:
-	~scene_proyecto();
+	~scene_nieve();
 
 	void init();
 	void awake();
@@ -57,11 +57,14 @@ private:
 	GLuint textureId;
 
 	std::vector<GLfloat> lifes;
+	std::vector<GLfloat> born;
 	std::vector<cgmath::vec4> positions;
 	std::vector<cgmath::vec3> veclocidad;
 	std::vector<cgmath::vec3> posicionesParticulaOrigen; // posicion original de la particula
 	std::vector<cgmath::vec3> colors;
 	std::vector<cgmath::vec2> textura;
+
+	std::vector<float> swingsBounds;
 
 	struct Particula {
 		int position;
@@ -71,9 +74,11 @@ private:
 		};
 	} particulas[MAX_PARTICULAS];
 
-	GLfloat aceleracion = 9.81f, bound = 80.f, lifeTime = 800;
+	GLfloat aceleracion = 9.81f;
+	GLfloat bound = 80.f, lifeTime = 1200;
+	GLfloat swing;
 
 	//Auxiliary variables
 	GLfloat x, y, z, willPartiTheParticleLive, aspect = 1.0f;
 	int index;
-};
+}; 
