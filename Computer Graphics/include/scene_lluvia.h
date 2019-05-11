@@ -50,7 +50,6 @@ public:
 	void setTexturas();
 	void resetParticula(int i);
 	void createParticalesVao();
-	void createFloorVao();
 	void createNormales();
 	void first_render();
 	void second_render();
@@ -62,34 +61,15 @@ public:
 
 private:
 	GLuint shader_program_depth, shader_program_shadow;
-	GLuint vao, vaoFloor;
+	GLuint vao, vaoWall;
 
 	// Particles
 	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO, normalsVBO;
-
-	cgmath::mat4 trans;
-	cgmath::mat4 Projection, View, Model, matrizDeCamara, ViewModel, mxpMatrix;
-	cgmath::vec3 moverCamara;
-
-	cgmath::mat4 camaraLuz;
-	cgmath::mat4 ViewLuz, OrtoProj, LightVPMatrix;
-
-	ILuint imageID, floorId;
-	GLuint textureId, textureFloorId;
-
 	std::vector<GLfloat> lifes;
 	std::vector<cgmath::vec4> positions;
-	std::vector<cgmath::vec3> veclocidad;
-	std::vector<cgmath::vec3> posicionesParticulaOrigen; // posicion original de la particula
+	std::vector<cgmath::vec3> veclocidad, normals, posicionesParticulaOrigen; // posicion original de la particula
 	std::vector<cgmath::vec2> textura;
-
-	// Floor
-	GLuint  floorNormalsVBO, indicesFloorBuffer, floorVBO, texturasFloorVBO, floorNormlasVBO;
-	std::vector<cgmath::vec3> floor, floorPosition;
-	std::vector<cgmath::vec3> normals, floorNormals;
-	std::vector<cgmath::vec2> texturaFloor;
-
-	cgmath::mat4 ModelFloor, mxpFloorMatrix;
+	GLfloat gravedad = 9.81f, bound = 80.f, upperBound = 100.f, lifeTime = 400, wind = 0;
 
 	struct Particula {
 		int position;
@@ -99,12 +79,33 @@ private:
 		};
 	} particulas[MAX_PARTICULAS];
 
-	GLfloat aceleracion = 9.81f, bound = 80.f, upperBound = 100.f, lifeTime = 800, wind = 0;
+	// Camara
+	cgmath::mat4 trans;
+	cgmath::mat4 Projection, View, Model, matrizDeCamara, ViewModel, mxpMatrix;
+	cgmath::vec3 moverCamara;
+
+	// Luz
+	cgmath::mat4 camaraLuz;
+	cgmath::mat4 ViewLuz, OrtoProj, LightVPMatrix;
+
+	// Texturas
+	ILuint imageID, floorId;
+	GLuint textureId, textureFloorId;
+
+	// Wall
+	GLuint wallNormalsVBO, indicesWallBuffer, wallVBO, texturasWallVBO;
+	std::vector<cgmath::vec3> wallPositions, wallNormals;
+	std::vector<cgmath::vec2> texturaWall;
+	cgmath::mat4 ModelWall, mxpWallMatrix;
+	GLfloat xFloor = 80, zFloor = 0, yFloor = 80;
+
+	// Pool
+	GLint willPartiTheParticleLive, particulasPorFrame = 100, rem = 0;
 
 	//Auxiliary variables
-	GLfloat x, y, z, willPartiTheParticleLive, aspect = 1.0f;
-	int index;
-	GLfloat xFloor = 80, zFloor = 0, yFloor = 80;
+	GLfloat x, y, z, aspect = 1.0f;
+	GLint index;
+	GLint width = 400, height = 400;
 
 	depth_buffer depthBuffer;
 };

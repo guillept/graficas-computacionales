@@ -54,6 +54,7 @@ private:
 
 	GLfloat x = 3.f, y = 3.f, z = 3.f, aspect = 1.0f;
 	GLfloat xFloor = 25.f, yFloor = 25.f, zFloor = 25.f;
+	GLint width = 400, height = 400;
 
 	int minimoNumeroVertices = 4;
 

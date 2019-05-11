@@ -76,34 +76,53 @@ void scene_fuego::normalKeysDown(unsigned char key)
 		moverCamara.x += 1;
 		break;
 	case 'z':
-		wind -= 0.05;
+		wind -= 0.01;
 		break;
+	case 'e':
+		moverCamara.y += 1;
+		break;
+	case 'q':
+		moverCamara.y -= 1;
 	case 'x':
 		wind = 0;
 		break;
 	case 'c':
-		wind += 0.05;
+		wind += 0.01;
 		break;
 	}
 }
 
-void scene_fuego::resize(int width, int height)
+void scene_fuego::resize(int w, int h)
 {
+	width = w;
+	height = h;
+
 	//Inicio, Fin (coordenadas)
 	glViewport(0, 0, width, height);
 	aspect = width / height;
 }
 
+
 void scene_fuego::mainLoop()
 {
 	// matrizDeCamara = rotz * rotY * rotx * scale * trans; 
 	// rotY y scale se eliminan = identidad
-	matrizDeCamara = rotateZ(moverCamara.z) * rotateX(moverCamara.x) * trans;
+	matrizDeCamara = rotateZ(moverCamara.z) *  rotateY(moverCamara.y) * rotateX(moverCamara.x) * trans;
 	View = cgmath::mat4::inverse(matrizDeCamara);
 
+	// Pool
+	float deltaTime = time::delta_time().count();
+	rem += particulasPorFrame * deltaTime;
+	willPartiTheParticleLive = 0;
+	if (rem > 1) {
+		willPartiTheParticleLive = floor(rem);
+		rem = particulasPorFrame * deltaTime + (rem - willPartiTheParticleLive);
+	}
+
+	// Sort
 	std::sort(&particulas[0], &particulas[MAX_PARTICULAS - 1]);
 
-	willPartiTheParticleLive = 0;
+	// Update
 	for (int i = 0; i < MAX_PARTICULAS; i++)
 	{
 		index = particulas[i].position;
@@ -125,11 +144,9 @@ void scene_fuego::mainLoop()
 
 		}
 		//particle is dead
-		else {
-			willPartiTheParticleLive = random(1, 500);
-			if (willPartiTheParticleLive >= 499) {
-				resetParticula(index);
-			}
+		else if (willPartiTheParticleLive > 0) {
+			resetParticula(index);
+			willPartiTheParticleLive--;
 		}
 	}
 
@@ -151,15 +168,15 @@ void scene_fuego::first_render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(shader_program_depth);
 
-	// Floor
-	mxpFloorMatrix = OrtoProj * ViewLuz;
+	// Wall
+	mxpWallMatrix = OrtoProj * ViewLuz;
 
 	// Enviar la matriz de vista. Enviar la matriz de vista-proyeccion de la camara en posicion luz.
 	GLuint mxpMatrix_location_floor = glGetUniformLocation(shader_program_depth, "mxpMatrix");
-	glUniformMatrix4fv(mxpMatrix_location_floor, 1, GL_FALSE, &mxpFloorMatrix[0][0]);
+	glUniformMatrix4fv(mxpMatrix_location_floor, 1, GL_FALSE, &mxpWallMatrix[0][0]);
 
 	//Renderear escena
-	glBindVertexArray(vaoFloor);
+	glBindVertexArray(vaoWall);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
 
@@ -197,7 +214,7 @@ void scene_fuego::first_render() {
 	//Unbind depth
 	// Desactivar el framebuffer personalizado. Regresar el viewport al tama�o de la ventana.
 	depthBuffer.unbind();
-	glViewport(0, 0, 400, 400);
+	glViewport(0, 0, width, height);
 }
 
 void scene_fuego::second_render() {
@@ -207,20 +224,20 @@ void scene_fuego::second_render() {
 
 	// Activar los shaders shaders de dibujado sombras Shadow.vert y Shadow.frag
 	glUseProgram(shader_program_shadow);
-	ModelFloor = cgmath::mat4(1.0);
-	mxpFloorMatrix = Projection * View;
+	ModelWall = cgmath::mat4(1.0);
+	mxpWallMatrix = Projection * View;
 
 	// Configurar todos los uniforms y matrices necesarios para phong shading. - init
 	// Enviar la matriz de vista. Enviar la matriz de vista-proyeccion de la camara en posicion luz.
 	// Hacer bind del mapa de profundidad y las texturas cada geometria. 
 	GLuint mxpMatrix_location_ligth = glGetUniformLocation(shader_program_shadow, "mxpMatrix");
-	glUniformMatrix4fv(mxpMatrix_location_ligth, 1, GL_FALSE, &mxpFloorMatrix[0][0]);
+	glUniformMatrix4fv(mxpMatrix_location_ligth, 1, GL_FALSE, &mxpWallMatrix[0][0]);
 
 	GLuint lightmvp_location = glGetUniformLocation(shader_program_shadow, "LightVPMatrix");
 	glUniformMatrix4fv(lightmvp_location, 1, GL_FALSE, &LightVPMatrix[0][0]);
 
 	GLuint model_location_ligth = glGetUniformLocation(shader_program_shadow, "modelMatrix");
-	glUniformMatrix4fv(model_location_ligth, 1, GL_FALSE, &ModelFloor[0][0]);
+	glUniformMatrix4fv(model_location_ligth, 1, GL_FALSE, &ModelWall[0][0]);
 
 	glActiveTexture(GL_TEXTURE0); // Se posicionan en el bucket 0
 	glBindTexture(GL_TEXTURE_2D, textureFloorId); // Activan la textura en ese bucket
@@ -229,7 +246,7 @@ void scene_fuego::second_render() {
 	depthBuffer.bindDepthMap();
 
 	// Renderear la escena
-	glBindVertexArray(vaoFloor);
+	glBindVertexArray(vaoWall);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr); //gl_trinagle_strip
 	glBindVertexArray(0);
 
@@ -435,38 +452,38 @@ void scene_fuego::createParticalesVao()
 	glBindVertexArray(0); //unbind vao
 
 	//-----------------------------------------------------------------------
-	//Floor
+	// Wall
 
-	std::vector<unsigned int> indicesFloor = { 0, 1, 2, 2, 3, 0 };
+	std::vector<unsigned int> indicesWall = { 0, 1, 2, 2, 3, 0 };
 	// Creacion y activacion del vao
-	glGenVertexArrays(1, &vaoFloor);
-	glBindVertexArray(vaoFloor);
+	glGenVertexArrays(1, &vaoWall);
+	glBindVertexArray(vaoWall);
 
 	// Creacion y configuracion del buffer del atributo de posicion
-	glGenBuffers(1, &floorVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec3) * floor.size(), floor.data(), GL_STATIC_DRAW);
+	glGenBuffers(1, &wallVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, wallVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec3) * wallPositions.size(), wallPositions.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind
 
 	// A diferencia de los buffers de atributos, los buffers de indices deben permanecer activos. No hacemos unbind.
-	glGenBuffers(1, &indicesFloorBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesFloorBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indicesFloor.size(), indicesFloor.data(), GL_STATIC_DRAW);
+	glGenBuffers(1, &indicesWallBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesWallBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indicesWall.size(), indicesWall.data(), GL_STATIC_DRAW);
 
 	// Creacion y configuracion del buffer del atributo de textura
-	glGenBuffers(1, &texturasFloorVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, texturasFloorVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * texturaFloor.size(), texturaFloor.data(), GL_STATIC_DRAW);
+	glGenBuffers(1, &texturasWallVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, texturasWallVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * texturaWall.size(), texturaWall.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Creacion y configuracion del buffer del atributo de textura
-	glGenBuffers(1, &floorNormalsVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, floorNormalsVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * floorNormals.size(), floorNormals.data(), GL_STATIC_DRAW);
+	glGenBuffers(1, &wallNormalsVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, wallNormalsVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cgmath::vec2) * wallNormals.size(), wallNormals.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -656,13 +673,12 @@ void scene_fuego::createParticalesVao()
 	glUseProgram(0);
 
 }
-
 void scene_fuego::createFloor() {
 
-	floor.push_back(cgmath::vec3(-xFloor, yFloor, 0)); //v1 - 0
-	floor.push_back(cgmath::vec3(-xFloor, -yFloor, 0)); //v2 - 1 
-	floor.push_back(cgmath::vec3(xFloor, -yFloor, 0)); //v3 - 2
-	floor.push_back(cgmath::vec3(xFloor, yFloor, 0)); //v4 - 3
+	wallPositions.push_back(cgmath::vec3(-xFloor, yFloor, 0)); //v1 - 0
+	wallPositions.push_back(cgmath::vec3(-xFloor, -yFloor, 0)); //v2 - 1 
+	wallPositions.push_back(cgmath::vec3(xFloor, -yFloor, 0)); //v3 - 2
+	wallPositions.push_back(cgmath::vec3(xFloor, yFloor, 0)); //v4 - 3
 }
 
 void scene_fuego::initParticulas()
@@ -702,10 +718,10 @@ void scene_fuego::setTexturas() {
 		textura.push_back(cgmath::vec2(0.0, 1.0));
 	}
 
-	texturaFloor.push_back(cgmath::vec2(1.0, 1.0));
-	texturaFloor.push_back(cgmath::vec2(1.0, 0.0));
-	texturaFloor.push_back(cgmath::vec2(0.0, 0.0));
-	texturaFloor.push_back(cgmath::vec2(0.0, 1.0));
+	texturaWall.push_back(cgmath::vec2(1.0, 1.0));
+	texturaWall.push_back(cgmath::vec2(1.0, 0.0));
+	texturaWall.push_back(cgmath::vec2(0.0, 0.0));
+	texturaWall.push_back(cgmath::vec2(0.0, 1.0));
 }
 
 void scene_fuego::createNormales()
@@ -716,11 +732,11 @@ void scene_fuego::createNormales()
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
 	normals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
 
-	//Floor
-	floorNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
-	floorNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
-	floorNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
-	floorNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	//Wall
+	wallNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	wallNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	wallNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
+	wallNormals.push_back(cgmath::vec3(0.0f, 0.0f, 1.0f));
 
 }
 
@@ -729,7 +745,7 @@ void scene_fuego::resetParticula(int i)
 	setXYZ();
 	positions[i] = cgmath::vec4(x, y, z, 1.0f);
 	veclocidad[i] = cgmath::vec3(0, 0, 0);
-	lifes[i] = lifeTime;
+	lifes[i] = lifeTime;// y * 2.5; // liftime  = posicion en y * 2.5
 	aceleracion[index].x = random(-maxAceleracion, maxAceleracion);
 	aceleracion[index].y = random(gravedad, gravedad * 3);
 	aceleracion[index].z = random(-maxAceleracion, maxAceleracion);
@@ -757,7 +773,7 @@ cgmath::vec3 scene_fuego::calculateDistance(int i)
 
 void scene_fuego::setXYZ()
 {
-	x = random(-0.1,0.1);
+	x = random(-1, 1);
 	y = -100.f;
-	z = random(30, 35);
+	z = random(30, 32);
 }

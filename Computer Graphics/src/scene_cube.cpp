@@ -13,7 +13,6 @@ scene_cube::~scene_cube()
 	// Borramos la memoria del ejecutable cuando la escena deja de existir.
 	glDeleteProgram(shader_program_depth);
 	glDeleteProgram(shader_program_shadow);
-	glDeleteProgram(shader_program_floor);
 }
 
 void scene_cube::init()
@@ -275,53 +274,6 @@ void scene_cube::init()
 		std::cout << std::endl;
 	}
 
-	//-------------------------------------------------------------------
-	shader_file.read("shaders/floor.vert");
-	vertex_source = shader_file.get_contents();
-	vertex_source_c = (const GLchar*)vertex_source.c_str();
-	GLuint floor_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(floor_vertex_shader, 1, &vertex_source_c, nullptr);
-	glCompileShader(floor_vertex_shader);
-
-	// Revision de errores de compilacion del vertex shader
-	GLint floor_vertex_compiled;
-	glGetShaderiv(floor_vertex_shader, GL_COMPILE_STATUS, &floor_vertex_compiled);
-	if (floor_vertex_compiled != GL_TRUE)
-	{
-		GLint log_length;
-		glGetShaderiv(floor_vertex_shader, GL_INFO_LOG_LENGTH, &log_length);
-
-		std::vector<GLchar> log;
-		log.resize(log_length);
-		glGetShaderInfoLog(floor_vertex_shader, log_length, &log_length, &log[0]);
-		std::cout << "Syntax errors in vertex shader: " << std::endl;
-		for (auto& c : log) std::cout << c;
-		std::cout << std::endl;
-	}
-
-	shader_file.read("shaders/floor.frag");
-	vertex_source = shader_file.get_contents();
-	fragment_source_c = (const GLchar*)vertex_source.c_str();
-	GLuint floor_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(floor_fragment_shader, 1, &fragment_source_c, nullptr);
-	glCompileShader(floor_fragment_shader);
-	// Revision de errores de compilacion del fragment shader
-	GLint floor_fragment_compiled;
-	glGetShaderiv(floor_fragment_shader, GL_COMPILE_STATUS, &floor_fragment_compiled);
-	if (floor_fragment_compiled != GL_TRUE)
-	{
-		GLint log_length;
-		glGetShaderiv(floor_fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
-
-		std::vector<GLchar> log;
-		log.resize(log_length);
-		glGetShaderInfoLog(floor_fragment_shader, log_length, &log_length, &log[0]);
-		std::cout << "Syntax errors in fragment shader: " << std::endl;
-		for (auto& c : log) std::cout << c;
-		std::cout << std::endl;
-	}
-
-
 	//--------------------------------------------------------------------
 
 	//Depth Shader
@@ -375,26 +327,7 @@ void scene_cube::init()
 	GLuint texture1_location_depthmap = glGetUniformLocation(shader_program_shadow, "DepthMap");
 	glUniform1i(texture1_location_depthmap, 1);
 
-	//-------------------------------------------------------
-	//Floor
-
-	shader_program_floor = glCreateProgram();
-	glAttachShader(shader_program_floor, floor_vertex_shader);
-	glAttachShader(shader_program_floor, floor_fragment_shader);
-
-	// Asignar Buffer a variables de IN en VertexShader
-	glBindAttribLocation(shader_program_floor, 0, "VertexPosition");
-	glBindAttribLocation(shader_program_floor, 1, "TexturePosition");
-	glLinkProgram(shader_program_floor);
-
-	// Borramos los shaders, porque ya tenemos el ejecutable
-	glDeleteShader(floor_vertex_shader);
-	glDeleteShader(floor_fragment_shader);
-
-	glUseProgram(shader_program_floor);
-
 	glUseProgram(0);
-
 
 }
 
@@ -442,7 +375,7 @@ void scene_cube::first_render() {
 	//Unbind depth
 	// Desactivar el framebuffer personalizado. Regresar el viewport al tamaño de la ventana.
 	depthBuffer.unbind();
-	glViewport(0, 0, 400, 400);
+	glViewport(0, 0, width, height);
 }
 
 void scene_cube::second_render() {
@@ -534,11 +467,13 @@ void scene_cube::mainLoop()
 	second_render();
 }
 
-void scene_cube::resize(int width, int height)
+void scene_cube::resize(int w, int h)
 {
+	width = w;
+	height = h;
+
 	//Inicio, Fin (coordenadas)
 	glViewport(0, 0, width, height);
-
 	aspect = width / height;
 }
 

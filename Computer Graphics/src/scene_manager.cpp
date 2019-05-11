@@ -105,7 +105,7 @@ void scene_manager::initialize()
 	//std::unique_ptr<scene> somescene(new scene_project);
 	//sceneList.push_back(std::move(somescene));
 	
-	/*std::unique_ptr<scene> scene1(new scene_compatibility);
+	std::unique_ptr<scene> scene1(new scene_compatibility);
 	sceneList.push_back(std::move(scene1));
 
 	std::unique_ptr<scene> scene2(new scene_primitives);
@@ -131,10 +131,9 @@ void scene_manager::initialize()
 
 	std::unique_ptr<scene> scene_circle(new scene_circle);
 	sceneList.push_back(std::move(scene_circle));
-	*/
 
-	/*std::unique_ptr<scene> scene_cube(new scene_cube);
-	sceneList.push_back(std::move(scene_cube));*/
+	std::unique_ptr<scene> scene_cube(new scene_cube);
+	sceneList.push_back(std::move(scene_cube));
 
 	std::unique_ptr<scene> scene_lluvia(new scene_lluvia);
 	sceneList.push_back(std::move(scene_lluvia));
