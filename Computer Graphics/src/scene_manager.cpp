@@ -133,17 +133,17 @@ void scene_manager::initialize()
 	sceneList.push_back(std::move(scene_circle));
 	*/
 
-	std::unique_ptr<scene> scene_cube(new scene_cube);
-	sceneList.push_back(std::move(scene_cube));
+	/*std::unique_ptr<scene> scene_cube(new scene_cube);
+	sceneList.push_back(std::move(scene_cube));*/
 
-	/*std::unique_ptr<scene> scene_lluvia(new scene_lluvia);
+	std::unique_ptr<scene> scene_lluvia(new scene_lluvia);
 	sceneList.push_back(std::move(scene_lluvia));
 
 	std::unique_ptr<scene> scene_nieve(new scene_nieve);
 	sceneList.push_back(std::move(scene_nieve));
 
 	std::unique_ptr<scene> scene_fuego(new scene_fuego);
-	sceneList.push_back(std::move(scene_fuego)); */
+	sceneList.push_back(std::move(scene_fuego)); 
 		
 	
 	for (auto& s : sceneList)
