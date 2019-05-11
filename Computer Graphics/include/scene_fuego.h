@@ -10,6 +10,8 @@
 #include <vector>
 #include <IL/il.h>
 
+#include "depth_buffer.h"
+
 #define MAX_PARTICULAS 1000
 
 class scene_fuego : public scene
@@ -27,42 +29,68 @@ public:
 	void normalKeysUp(unsigned char key) { }
 	void specialKeys(int key) { }
 	void passiveMotion(int x, int y) { }
-	GLfloat radians(GLfloat grados);
+
+	// OPERACIONES DE MATRICES
 	cgmath::mat4 rotateX(GLfloat iTime);
 	cgmath::mat4 rotateY(GLfloat iTime);
 	cgmath::mat4 rotateZ(GLfloat iTime);
 	cgmath::mat4 translation(GLfloat x, GLfloat y, GLfloat z);
 	cgmath::mat4 projection();
+	cgmath::mat4 camera(cgmath::vec3 camara);
+	cgmath::mat4 ortographicProjection();
+	void billboard(cgmath::mat4 view);
 
-	//Auxiliary algorithms
+	// OPERACIONES MATEMÁTICAS
+	GLfloat radians(GLfloat grados);
+	GLfloat random(GLfloat fMax, GLfloat fMin);
+	cgmath::vec3 calculateDistance(int i);
+
+	// CONTROLAR LAS PARTICULAS
 	void initParticulas();
 	void setTexturas();
 	void resetParticula(int i);
-	GLfloat random(GLfloat fMax, GLfloat fMin);
-	cgmath::vec3 calculateDistance(int i);
-	void billboard();
+	void createParticalesVao();
+	void createFloorVao();
+	void createNormales();
+	void first_render();
+	void second_render();
+	void createFloor();
+
+	// FUNCIONES AUXILIARES
 	void setXYZ();
-	void setColors();
+
 
 private:
-	GLuint shader_program;
-	GLuint vao;
-	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO;
+	GLuint shader_program_depth, shader_program_shadow;
+	GLuint vao, vaoFloor;
+
+	// Particles
+	GLuint positionsVBO, colorsVBO, mxpMatrixVBO, indicesBuffer, texturasVBO, normalsVBO;
 
 	cgmath::mat4 trans;
 	cgmath::mat4 Projection, View, Model, matrizDeCamara, ViewModel, mxpMatrix;
 	cgmath::vec3 moverCamara;
 
-	ILuint imageID;
-	GLuint textureId;
+	cgmath::mat4 camaraLuz;
+	cgmath::mat4 ViewLuz, OrtoProj, LightVPMatrix;
+
+	ILuint imageID, floorId;
+	GLuint textureId, textureFloorId;
 
 	std::vector<GLfloat> lifes;
 	std::vector<cgmath::vec4> positions;
 	std::vector<cgmath::vec3> veclocidad;
-	std::vector<cgmath::vec3> posicionesParticulaOrigen; // posicion original de la particula
-	std::vector<cgmath::vec3> colors;
-	std::vector<cgmath::vec2> textura;
 	std::vector<cgmath::vec3> aceleracion;
+	std::vector<cgmath::vec3> posicionesParticulaOrigen; // posicion original de la particula
+	std::vector<cgmath::vec2> textura;
+
+	// Floor
+	GLuint  floorNormalsVBO, indicesFloorBuffer, floorVBO, texturasFloorVBO, floorNormlasVBO;
+	std::vector<cgmath::vec3> floor, floorPosition;
+	std::vector<cgmath::vec3> normals, floorNormals;
+	std::vector<cgmath::vec2> texturaFloor;
+
+	cgmath::mat4 ModelFloor, mxpFloorMatrix;
 
 	struct Particula {
 		int position;
@@ -72,10 +100,12 @@ private:
 		};
 	} particulas[MAX_PARTICULAS];
 
-	GLfloat maxAceleracion = 7, bound = 10.f, lifeTime = 500;
-	GLfloat gravedad = 9.81;
+	GLfloat bound = 80.f, upperBound = 100.f, lifeTime = 800, wind = 0, maxAceleracion = 5, gravedad = 9.81;
 
 	//Auxiliary variables
-	GLfloat x, y, z, willPartiTheParticleLive, willPartiThePaticleStayInTheFire, aspect = 1.0f;
+	GLfloat x, y, z, willPartiTheParticleLive, aspect = 1.0f;
 	int index;
-}; 
+	GLfloat xFloor = 80, zFloor = 0, yFloor = 80;
+
+	depth_buffer depthBuffer;
+};
